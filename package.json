@@ -1,10 +1,28 @@
 {
   "name": "@blogflow/sdk",
-  "version": "0.1.4",
+  "version": "0.2.1",
   "description": "TypeScript SDK for BlogFlow API Server v2 - A lightweight client for fetching blog posts with multilingual support",
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./core": {
+      "types": "./dist/core.d.ts",
+      "import": "./dist/core.js",
+      "require": "./dist/core.cjs"
+    },
+    "./react": {
+      "types": "./dist/react.d.ts",
+      "import": "./dist/react.js",
+      "require": "./dist/react.cjs"
+    }
+  },
   "files": [
     "dist"
   ],
@@ -35,7 +53,7 @@
   "license": "ISC",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ausdata/blogflow-sdk"
+    "url": "git+https://github.com/ausdata/blogflow-sdk.git"
   },
   "homepage": "https://ausdata.ai",
   "bugs": {
@@ -44,7 +62,13 @@
   "publishConfig": {
     "access": "public"
   },
+  "peerDependencies": {
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0"
+  },
   "devDependencies": {
+    "@types/react": "^19.2.6",
+    "@types/react-dom": "^19.2.3",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3"
   }

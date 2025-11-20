@@ -2,6 +2,8 @@
  * BlogFlow SDK
  * TypeScript SDK for BlogFlow API Server v2
  * 
+ * Default entry point - re-exports core functionality
+ * 
  * @example
  * ```typescript
  * import { BlogFlow, createClient } from '@blogflow/sdk'
@@ -27,14 +29,5 @@
  * ```
  */
 
-// Export all types
-export * from './types'
-
-// Export client class
-export { BlogFlow } from './client'
-
-// Export factory function
-import { BlogFlow } from './client'
-import { BlogFlowConfig } from './types'
-
-export const createClient = (config: BlogFlowConfig) => new BlogFlow(config)
+// Re-export everything from core
+export * from './core'
