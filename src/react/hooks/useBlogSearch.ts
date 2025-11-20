@@ -31,6 +31,8 @@ export interface UseBlogSearchOptions {
   caseSensitive?: boolean
   /** Enable automatic search on searchTerm change (default: true, only for server mode) */
   autoSearch?: boolean
+  /** Initial page for server-side mode (default: 1) */
+  page?: number
 }
 
 export interface UseBlogSearchReturn {
@@ -46,6 +48,20 @@ export interface UseBlogSearchReturn {
   search: () => void
   /** Clear search results */
   clear: () => void
+  /** Total number of matching results */
+  totalCount: number
+  /** Current page number (server mode) */
+  page: number
+  /** Page size (server mode) */
+  pageSize: number
+  /** Total number of pages (server mode) */
+  totalPages: number
+  /** Whether next page exists (server mode) */
+  hasNextPage: boolean
+  /** Whether previous page exists (server mode) */
+  hasPreviousPage: boolean
+  /** Jump to a page (server mode) */
+  setPage: (page: number) => void
   /** Number of results */
   resultCount: number
 
@@ -91,6 +107,7 @@ export function useBlogSearch(
     lang,
     caseSensitive = false,
     autoSearch = true,
+    page: initialPage = 1,
   } = options
 
   // Auto-detect mode: if posts provided, use client mode
@@ -103,22 +120,53 @@ export function useBlogSearch(
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [hasSearched, setHasSearched] = useState(false)
+  const [pagination, setPagination] = useState({
+    totalCount: 0,
+    totalPages: 0,
+    hasNextPage: false,
+    hasPreviousPage: false,
+  })
+  const safeInitialPage = Math.max(1, Math.floor(initialPage) || 1)
+  const [page, setPageState] = useState(safeInitialPage)
 
   const searchTermRef = useRef(searchTerm)
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const pageRef = useRef(safeInitialPage)
+
+  const updatePage = useCallback((nextPage: number) => {
+    const safePage = Math.max(1, Math.floor(nextPage) || 1)
+    pageRef.current = safePage
+    setPageState(safePage)
+  }, [])
+
+  useEffect(() => {
+    if (mode !== 'server') return
+    const normalized = Math.max(1, Math.floor(initialPage) || 1)
+    if (normalized !== pageRef.current) {
+      pageRef.current = normalized
+      setPageState(normalized)
+    }
+  }, [initialPage, mode])
 
   useEffect(() => {
     searchTermRef.current = searchTerm
   }, [searchTerm])
 
   // Server-side search function
-  const performServerSearch = useCallback(async () => {
+  const performServerSearch = useCallback(async (requestedPage?: number) => {
     const currentSearchTerm = searchTermRef.current.trim()
 
     if (!currentSearchTerm) {
       setServerResults([])
       setHasSearched(false)
       setError(null)
+      setPagination({
+        totalCount: 0,
+        totalPages: 0,
+        hasNextPage: false,
+        hasPreviousPage: false,
+      })
+      updatePage(1)
       return
     }
 
@@ -127,24 +175,39 @@ export function useBlogSearch(
     setHasSearched(true)
 
     try {
-      const posts = await client.getPosts({
+      const pageToFetch = typeof requestedPage === 'number' ? requestedPage : pageRef.current
+      const response = await client.getPaginatedPosts({
         search: currentSearchTerm,
         searchFields,
-        limit,
+        page: pageToFetch,
+        pageSize: limit,
         sort,
         order,
         lang: lang as any,
       })
-      setServerResults(posts)
+      setServerResults(response.items)
+      updatePage(response.page)
+      setPagination({
+        totalCount: response.totalCount,
+        totalPages: response.totalPages,
+        hasNextPage: response.hasNextPage,
+        hasPreviousPage: response.hasPreviousPage,
+      })
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : 'Failed to search posts'
       setError(errorMessage)
       setServerResults([])
+      setPagination({
+        totalCount: 0,
+        totalPages: 0,
+        hasNextPage: false,
+        hasPreviousPage: false,
+      })
     } finally {
       setLoading(false)
     }
-  }, [client, searchFields, limit, sort, order, lang])
+  }, [client, searchFields, limit, sort, order, lang, updatePage])
 
   // Client-side filtering with useMemo
   const clientResults = useMemo(() => {
@@ -181,11 +244,18 @@ export function useBlogSearch(
       setServerResults([])
       setHasSearched(false)
       setError(null)
+      setPagination({
+        totalCount: 0,
+        totalPages: 0,
+        hasNextPage: false,
+        hasPreviousPage: false,
+      })
+      updatePage(1)
       return
     }
 
     debounceTimerRef.current = setTimeout(() => {
-      performServerSearch()
+      performServerSearch(1)
     }, debounceMs)
 
     return () => {
@@ -200,10 +270,29 @@ export function useBlogSearch(
       setServerResults([])
       setError(null)
       setHasSearched(false)
+      setPagination({
+        totalCount: 0,
+        totalPages: 0,
+        hasNextPage: false,
+        hasPreviousPage: false,
+      })
+      updatePage(1)
     }
-  }, [mode])
+  }, [mode, updatePage])
+
+  const setPage = useCallback(
+    (nextPage: number) => {
+      if (mode !== 'server') return
+      const safePage = Math.max(1, Math.floor(nextPage) || 1)
+      updatePage(safePage)
+      performServerSearch(safePage)
+    },
+    [mode, performServerSearch, updatePage]
+  )
 
   const results = mode === 'server' ? serverResults : clientResults
+  const totalCount =
+    mode === 'server' ? pagination.totalCount : results.length
   const resultCount = results.length
 
   return {
@@ -213,6 +302,13 @@ export function useBlogSearch(
     hasSearched: mode === 'server' ? hasSearched : true,
     search: mode === 'server' ? performServerSearch : () => {},
     clear,
+    totalCount,
+    page: mode === 'server' ? page : 1,
+    pageSize: limit,
+    totalPages: mode === 'server' ? pagination.totalPages || (results.length > 0 ? 1 : 0) : 1,
+    hasNextPage: mode === 'server' ? pagination.hasNextPage : false,
+    hasPreviousPage: mode === 'server' ? pagination.hasPreviousPage : false,
+    setPage,
     resultCount,
     // Backward compatibility
     filteredPosts: results,

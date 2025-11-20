@@ -7,6 +7,8 @@ import {
   BlogFlowConfig,
   SupportedLanguage,
   V2GetPostsParams,
+  V2GetPaginatedPostsParams,
+  V2PaginatedPostsResponse,
   V2PostListItem,
   V2Post,
   V2ErrorResponse,
@@ -244,5 +246,45 @@ export class BlogFlow {
     }
 
     return this.request<V2Post>(endpoint, fetchOptions)
+  }
+
+  /**
+   * Get paginated posts list with metadata (total count, total pages)
+   *
+   * @param params Query parameters
+   * @returns Paginated posts response
+   */
+  async getPaginatedPosts(
+    params: V2GetPaginatedPostsParams = {}
+  ): Promise<V2PaginatedPostsResponse> {
+    const queryParams: Record<string, any> = {}
+
+    if (params.lang !== undefined) queryParams.lang = params.lang
+    else if (this.defaultLanguage) queryParams.lang = this.defaultLanguage
+
+    if (params.page !== undefined) queryParams.page = params.page
+    if (params.pageSize !== undefined) queryParams.pageSize = params.pageSize
+    else if (params.limit !== undefined) queryParams.pageSize = params.limit
+
+    if (params.sort) queryParams.sort = params.sort
+    if (params.order) queryParams.order = params.order
+
+    if (params.search) queryParams.search = params.search
+    if (params.searchFields && params.searchFields.length > 0) {
+      queryParams.searchFields = params.searchFields.join(',')
+    }
+
+    const queryString = this.buildQueryString(queryParams)
+    const endpoint = `/posts/paginated${queryString ? `?${queryString}` : ''}`
+
+    const fetchOptions: RequestInit & { next?: NextFetchOptions } = {}
+    if (params.next) {
+      fetchOptions.next = params.next
+    }
+    if (params.cache) {
+      fetchOptions.cache = params.cache
+    }
+
+    return this.request<V2PaginatedPostsResponse>(endpoint, fetchOptions)
   }
 }

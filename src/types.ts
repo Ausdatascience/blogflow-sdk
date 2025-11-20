@@ -57,6 +57,23 @@ export interface V2GetPostsParams {
   cache?: RequestCache
 }
 
+export interface V2GetPaginatedPostsParams extends V2GetPostsParams {
+  /** 1-based page number (default: 1) */
+  page?: number
+  /** Page size (default: 12, max: 100). Alias for limit */
+  pageSize?: number
+}
+
+export interface V2PaginatedPostsResponse {
+  items: V2PostListItem[]
+  page: number
+  pageSize: number
+  totalCount: number
+  totalPages: number
+  hasNextPage: boolean
+  hasPreviousPage: boolean
+}
+
 export interface V2PostListItem {
   id: number
   title: string
