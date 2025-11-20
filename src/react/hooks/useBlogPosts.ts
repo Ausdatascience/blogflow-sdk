@@ -3,7 +3,7 @@
  * Fetches and manages blog posts list with pagination support
  */
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { V2PostListItem, V2GetPostsParams, SupportedLanguage } from '../../core'
 import { useBlogFlowClient } from '../context/BlogFlowContext'
 
@@ -58,8 +58,10 @@ export function useBlogPosts(options: UseBlogPostsOptions = {}): UseBlogPostsRet
   const [totalCount, setTotalCount] = useState(0)
   const [currentPage, setCurrentPage] = useState(page)
 
+  const stableQueryParams = useMemo(() => ({ ...otherParams }), [JSON.stringify(otherParams)])
+
   const fetchPosts = useCallback(async (
-    targetPage: number = currentPage,
+    targetPage: number,
     append: boolean = false
   ) => {
     try {
@@ -68,7 +70,7 @@ export function useBlogPosts(options: UseBlogPostsOptions = {}): UseBlogPostsRet
 
       const offset = (targetPage - 1) * pageSize
       const params: V2GetPostsParams = {
-        ...otherParams,
+        ...stableQueryParams,
         limit: pageSize,
         offset,
       }
@@ -85,12 +87,13 @@ export function useBlogPosts(options: UseBlogPostsOptions = {}): UseBlogPostsRet
         setPosts(data)
       }
 
-      setHasMore(data.length === pageSize)
+      const receivedCount = data.length
+      setHasMore(receivedCount === pageSize)
       setTotalCount(prev => {
         if (append) {
-          return prev + data.length
+          return prev + receivedCount
         }
-        return data.length === pageSize ? (targetPage * pageSize) + 1 : (targetPage - 1) * pageSize + data.length
+        return (targetPage - 1) * pageSize + receivedCount
       })
       setCurrentPage(targetPage)
     } catch (err) {
@@ -102,13 +105,13 @@ export function useBlogPosts(options: UseBlogPostsOptions = {}): UseBlogPostsRet
     } finally {
       setLoading(false)
     }
-  }, [client, lang, pageSize, currentPage, ...Object.values(otherParams)])
+  }, [client, lang, pageSize, stableQueryParams])
 
   useEffect(() => {
     if (autoFetch) {
       fetchPosts(page, false)
     }
-  }, [autoFetch, page])
+  }, [autoFetch, page, fetchPosts])
 
   const loadMore = useCallback(async () => {
     if (hasMore && !loading) {

@@ -3,7 +3,7 @@
  * Provides BlogFlow client instance to React components
  */
 
-import { createContext, useContext, ReactNode } from 'react'
+import { createContext, useContext, ReactNode, useMemo } from 'react'
 import { BlogFlow, BlogFlowConfig } from '../../core'
 
 interface BlogFlowContextValue {
@@ -34,7 +34,15 @@ export interface BlogFlowProviderProps {
  * ```
  */
 export function BlogFlowProvider({ config, children }: BlogFlowProviderProps) {
-  const client = new BlogFlow(config)
+  const client = useMemo(
+    () =>
+      new BlogFlow({
+        apiKey: config.apiKey,
+        baseUrl: config.baseUrl,
+        defaultLanguage: config.defaultLanguage,
+      }),
+    [config.apiKey, config.baseUrl, config.defaultLanguage]
+  )
 
   return (
     <BlogFlowContext.Provider value={{ client }}>

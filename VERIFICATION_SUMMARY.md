@@ -1,7 +1,7 @@
 # 🎉 Evaluation Issues - Final Verification Summary
 
 **Date:** 2025-11-20
-**SDK Version:** 0.4.1
+**SDK Version:** 0.4.2
 **Build Status:** ✅ Passing
 **npm Status:** ✅ Published
 
@@ -318,6 +318,48 @@ const staticPosts = await client.getPosts({
 
 ---
 
+### 🟡 Issue 4: Pagination Freshness & Provider Stability - **FIXED** ✅
+
+**Priority:** RECOMMENDED (建议优化)
+
+**Problem:**
+- `useBlogPosts` only fetched data on mount, so changing `lang`, `search`, or other filters left the UI stale and `totalPages` inflated.
+- `BlogFlowProvider` instantiated a new SDK client every render, causing extra API calls and breaking hook memoisation.
+
+**Solution Implemented (v0.4.2):**
+
+```typescript
+// src/react/hooks/useBlogPosts.ts
+const stableQueryParams = useMemo(() => ({ ...otherParams }), [JSON.stringify(otherParams)])
+
+useEffect(() => {
+  if (autoFetch) {
+    fetchPosts(page, false)
+  }
+}, [autoFetch, page, fetchPosts])
+
+setTotalCount(prev => append ? prev + receivedCount : (targetPage - 1) * pageSize + receivedCount)
+```
+
+```typescript
+// src/react/context/BlogFlowContext.tsx
+const client = useMemo(
+  () => new BlogFlow({ apiKey: config.apiKey, baseUrl: config.baseUrl, defaultLanguage: config.defaultLanguage }),
+  [config.apiKey, config.baseUrl, config.defaultLanguage]
+)
+```
+
+**Impact:**
+- Fresh data whenever filters change—no manual refresh needed.
+- Accurate `totalPages`/`hasMore`, eliminating phantom pagination.
+- Stable provider instance prevents duplicate fetches and keeps hooks memoised.
+
+**Documentation Updates:**
+- README “Key Features” now highlights the 0.4.2 reliability fixes.
+- Evaluation and verification summaries reference the new behaviour.
+
+---
+
 ## 📊 Summary Table
 
 | Issue | Priority | Status | Version Fixed | Files Modified |
@@ -325,17 +367,19 @@ const staticPosts = await client.getPosts({
 | Search pagination conflict | 🔴 MUST FIX | ✅ Resolved | v0.4.0 | `useBlogSearch.ts`, `client.ts`, `types.ts`, API backend |
 | Styling customization | 🟢 RECOMMENDED | ✅ Supported | v0.1.0 | All component files |
 | Cache control | 🟡 RECOMMENDED | ✅ Implemented | v0.4.1 | `client.ts`, `types.ts` |
+| Pagination freshness & provider stability | 🟡 RECOMMENDED | ✅ Resolved | v0.4.2 | `useBlogPosts.ts`, `BlogFlowContext.tsx`, docs |
 
 ---
 
 ## 📦 Package Information
-
+ 
 **npm Package:** `@blogflow/sdk`
-**Current Version:** `0.4.1`
+**Current Version:** `0.4.2`
 **Published:** ✅ Yes
 **Deprecated Versions:** 0.1.x, 0.2.x (with migration notice)
 
 **Version History:**
+- `0.4.2` - ✅ Pagination + provider stability fixes
 - `0.4.1` - ✅ Next.js ISR cache support
 - `0.4.0` - ✅ Server-side search by default
 - `0.3.0` - Server-side search, SSR support
@@ -352,7 +396,7 @@ const staticPosts = await client.getPosts({
 2. ✅ `CACHING_GUIDE.md` - ISR caching guide with examples
 3. ✅ `MIGRATION_0.4.0.md` - Migration guide for v0.4.0
 4. ✅ `SERVER_SEARCH_EXAMPLE.md` - Server-side search examples
-5. ✅ `README.md` - Updated with v0.4.1 features
+5. ✅ `README.md` - Updated with v0.4.2 features
 6. ✅ `VERIFICATION_SUMMARY.md` - This file
 
 **API Documentation:**
@@ -371,7 +415,7 @@ npm run build
 **Package verification:**
 ```bash
 npm view @blogflow/sdk version
-# ✅ 0.4.1
+# ✅ 0.4.2
 
 npm view @blogflow/sdk@0.1.4
 # ✅ DEPRECATED with migration notice
@@ -390,6 +434,7 @@ npm view @blogflow/sdk@0.1.4
 - [x] Issue 1: Search pagination conflict fixed
 - [x] Issue 2: Styling customization verified
 - [x] Issue 3: Cache control implemented
+- [x] Issue 4: Pagination freshness & provider stability fixed
 - [x] Build successful
 - [x] Tests passing (no test errors)
 - [x] Documentation complete

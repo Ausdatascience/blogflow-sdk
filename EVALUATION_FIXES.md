@@ -1,6 +1,6 @@
 # Evaluation Issues - Resolution Report
 
-**SDK Version:** 0.4.1
+**SDK Version:** 0.4.2
 **Status:** ✅ All Issues Resolved
 **Date:** 2025-11-20
 
@@ -13,6 +13,7 @@
 | 🔴 MUST FIX | Search pagination conflict | ✅ Resolved | v0.4.0 |
 | 🟢 RECOMMENDED | Styling customization | ✅ Supported | v0.1.0 |
 | 🟡 RECOMMENDED | Cache control | ✅ Implemented | v0.4.1 |
+| 🟡 RECOMMENDED | Pagination freshness & provider stability | ✅ Resolved | v0.4.2 |
 
 ---
 
@@ -479,10 +480,66 @@ Comprehensive caching guide available: **`CACHING_GUIDE.md`**
 
 ---
 
+## 🟡 Issue 4: Pagination Freshness & Provider Stability
+
+### Problem Description
+- `useBlogPosts` only refetched on initial mount, so changing `lang`, `search`, or other parameters left the list stale.
+- The hook also guessed total counts by “adding one extra” whenever a page was full, producing phantom pages.
+- `BlogFlowProvider` instantiated a brand-new SDK client on every render, invalidating memoised hooks and causing extra network calls.
+
+### ✅ Solution Implemented (v0.4.2)
+
+1. **Reactive refetching + accurate totals**
+
+```typescript
+const stableQueryParams = useMemo(() => ({ ...otherParams }), [JSON.stringify(otherParams)])
+
+useEffect(() => {
+  if (autoFetch) {
+    fetchPosts(page, false)
+  }
+}, [autoFetch, page, fetchPosts])
+
+setTotalCount(prev => {
+  if (append) {
+    return prev + receivedCount
+  }
+  return (targetPage - 1) * pageSize + receivedCount
+})
+```
+- Any change to pagination inputs or filters now triggers a fresh API call.
+- Total counts reflect the real items fetched instead of synthetic “+1” placeholders, so `totalPages` and `hasMore` stay honest.
+
+2. **Memoised provider client**
+
+```typescript
+const client = useMemo(
+  () => new BlogFlow({ apiKey: config.apiKey, baseUrl: config.baseUrl, defaultLanguage: config.defaultLanguage }),
+  [config.apiKey, config.baseUrl, config.defaultLanguage]
+)
+```
+
+- The React context now reuses the same SDK instance unless the config values actually change, eliminating redundant requests and state resets.
+
+### Impact
+
+| Metric | Before | After | Improvement |
+|--------|--------|-------|-------------|
+| Filter changes triggering refetch | ❌ No | ✅ Yes | Fresh data |
+| Total pages accuracy | ❌ Over-reported | ✅ Exact | No phantom pages |
+| Provider client churn | Every render | On config changes only | Stable hooks |
+
+### Documentation
+- README “Key Features” updated to highlight the reliability fixes.
+- `EVALUATION_FIXES.md` (this file) and `VERIFICATION_SUMMARY.md` now describe v0.4.2 behaviour.
+
+---
+
 ## 📦 Version History
 
 | Version | Features | Breaking Changes |
 |---------|----------|------------------|
+| **0.4.2** | ✅ Pagination + provider stability fixes | None |
 | **0.4.1** | ✅ Next.js ISR cache support | None |
 | **0.4.0** | ✅ Server-side search by default | `useBlogSearch` API changed |
 | **0.3.0** | Server-side search, SSR support | None |
@@ -497,8 +554,9 @@ All evaluation issues have been resolved:
 1. ✅ **Search pagination conflict** - Fixed in v0.4.0 with server-side search
 2. ✅ **Styling customization** - Supported since v0.1.0 with `className` props
 3. ✅ **Cache control** - Implemented in v0.4.1 with Next.js ISR support
+4. ✅ **Pagination freshness & provider stability** - Fixed in v0.4.2
 
-**Current SDK version:** `0.4.1`
+**Current SDK version:** `0.4.2`
 **Build status:** ✅ Passing
 **Production ready:** ✅ Yes
 
