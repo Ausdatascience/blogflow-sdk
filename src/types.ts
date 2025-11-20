@@ -28,6 +28,14 @@ export interface BlogFlowConfig {
 
 export type SearchField = 'title' | 'excerpt' | 'category' | 'slug'
 
+// Next.js fetch cache options
+export interface NextFetchOptions {
+  /** Revalidate cache every N seconds (ISR) */
+  revalidate?: number | false
+  /** Tag for on-demand revalidation */
+  tags?: string[]
+}
+
 export interface V2GetPostsParams {
   /** Language code */
   lang?: SupportedLanguage
@@ -43,6 +51,10 @@ export interface V2GetPostsParams {
   search?: string
   /** Fields to search in (default: ['title', 'excerpt', 'category']) */
   searchFields?: SearchField[]
+  /** Next.js fetch cache options (for SSR/ISR) */
+  next?: NextFetchOptions
+  /** Standard fetch cache option */
+  cache?: RequestCache
 }
 
 export interface V2PostListItem {

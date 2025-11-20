@@ -14,6 +14,7 @@ import {
   BlogFlowAuthError,
   BlogFlowNotFoundError,
   BlogFlowServerError,
+  NextFetchOptions,
 } from './types'
 
 const DEFAULT_BASE_URL = 'https://blogflow-api-server.vercel.app/api/v2'
@@ -139,6 +140,21 @@ export class BlogFlow {
    *   search: 'javascript',
    *   searchFields: ['title']
    * })
+   *
+   * // Next.js ISR cache (revalidate every 60 seconds)
+   * const cachedPosts = await client.getPosts({
+   *   next: { revalidate: 60 }
+   * })
+   *
+   * // Next.js on-demand revalidation with tags
+   * const taggedPosts = await client.getPosts({
+   *   next: { tags: ['posts'] }
+   * })
+   *
+   * // Force no cache
+   * const freshPosts = await client.getPosts({
+   *   cache: 'no-store'
+   * })
    * ```
    */
   async getPosts(params: V2GetPostsParams = {}): Promise<V2PostListItem[]> {
@@ -161,24 +177,48 @@ export class BlogFlow {
     const queryString = this.buildQueryString(queryParams)
     const endpoint = `/posts${queryString ? `?${queryString}` : ''}`
 
-    return this.request<V2PostListItem[]>(endpoint)
+    // Build fetch options with cache settings
+    const fetchOptions: RequestInit & { next?: NextFetchOptions } = {}
+    if (params.next) {
+      fetchOptions.next = params.next
+    }
+    if (params.cache) {
+      fetchOptions.cache = params.cache
+    }
+
+    return this.request<V2PostListItem[]>(endpoint, fetchOptions)
   }
 
   /**
    * Get single post by slug - Full content
-   * 
+   *
    * @param slug Post slug
    * @param options Additional options
    * @returns Full post object with complete content
-   * 
+   *
    * @example
    * ```typescript
    * const post = await client.getPost('my-article-slug', { lang: 'zh' })
+   *
+   * // With Next.js ISR cache (revalidate every 3600 seconds = 1 hour)
+   * const cachedPost = await client.getPost('my-article-slug', {
+   *   lang: 'zh',
+   *   next: { revalidate: 3600 }
+   * })
+   *
+   * // With cache tags for on-demand revalidation
+   * const taggedPost = await client.getPost('my-article-slug', {
+   *   next: { tags: ['posts', 'my-article-slug'] }
+   * })
    * ```
    */
   async getPost(
     slug: string,
-    options: { lang?: SupportedLanguage } = {}
+    options: {
+      lang?: SupportedLanguage
+      next?: NextFetchOptions
+      cache?: RequestCache
+    } = {}
   ): Promise<V2Post> {
     if (!slug) {
       throw new Error('BlogFlow: Post slug is required')
@@ -194,6 +234,15 @@ export class BlogFlow {
     const queryString = this.buildQueryString(queryParams)
     const endpoint = `/posts/${slug}${queryString ? `?${queryString}` : ''}`
 
-    return this.request<V2Post>(endpoint)
+    // Build fetch options with cache settings
+    const fetchOptions: RequestInit & { next?: NextFetchOptions } = {}
+    if (options.next) {
+      fetchOptions.next = options.next
+    }
+    if (options.cache) {
+      fetchOptions.cache = options.cache
+    }
+
+    return this.request<V2Post>(endpoint, fetchOptions)
   }
 }
