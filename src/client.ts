@@ -1,71 +1,186 @@
-// src/client.ts
-import { BlogFlowConfig, BlogPost, GetPostsParams } from './types';
+/**
+ * BlogFlow SDK Client
+ * Provides methods to interact with BlogFlow API Server v2
+ */
 
-// 🚨 这里的地址要换成你 BlogFlow 后端真实的 API 地址
-const DEFAULT_API_URL = "https://bloglink-api-sql.vercel.app/v2"; 
+import {
+  BlogFlowConfig,
+  SupportedLanguage,
+  V2GetPostsParams,
+  V2PostListItem,
+  V2Post,
+  V2ErrorResponse,
+  BlogFlowError,
+  BlogFlowAuthError,
+  BlogFlowNotFoundError,
+  BlogFlowServerError,
+} from './types'
+
+const DEFAULT_BASE_URL = 'https://blogflow-api-server.vercel.app/api/v2'
 
 export class BlogFlow {
-  private apiKey: string;
-  private baseUrl: string;
+  private apiKey: string
+  private baseUrl: string
+  private defaultLanguage?: SupportedLanguage
 
   constructor(config: BlogFlowConfig) {
     if (!config.apiKey) {
-      throw new Error("BlogFlow Error: API Key is required.");
+      throw new Error('BlogFlow: API Key is required')
     }
-    this.apiKey = config.apiKey;
-    this.baseUrl = config.baseUrl || DEFAULT_API_URL;
+
+    this.apiKey = config.apiKey
+    this.baseUrl = config.baseUrl || DEFAULT_BASE_URL
+    this.defaultLanguage = config.defaultLanguage
   }
 
   /**
-   * 通用 Fetch 方法 (带鉴权和错误处理)
+   * Make an authenticated request to the API
    */
-  private async request<T>(endpoint: string, options?: RequestInit): Promise<T> {
-    const url = `${this.baseUrl}${endpoint}`;
+  private async request<T>(
+    endpoint: string,
+    options: RequestInit = {}
+  ): Promise<T> {
+    const url = `${this.baseUrl}${endpoint}`
     const headers = {
-      "Authorization": `Bearer ${this.apiKey}`,
-      "Content-Type": "application/json",
-      ...options?.headers,
-    };
+      Authorization: `Bearer ${this.apiKey}`,
+      'Content-Type': 'application/json',
+      ...options.headers,
+    }
 
     try {
-      // Next.js 默认会缓存 fetch，这里我们允许用户通过 options 控制缓存
-      const res = await fetch(url, { ...options, headers });
+      const response = await fetch(url, {
+        ...options,
+        headers,
+      })
 
-      if (!res.ok) {
-        throw new Error(`BlogFlow API Error: ${res.status} ${res.statusText}`);
+      // Handle non-JSON responses
+      const contentType = response.headers.get('content-type')
+      if (!contentType || !contentType.includes('application/json')) {
+        if (!response.ok) {
+          throw new BlogFlowError(
+            `HTTP ${response.status}: ${response.statusText}`,
+            response.status
+          )
+        }
+        throw new BlogFlowError('Invalid response format')
       }
 
-      return await res.json();
+      const data = await response.json()
+
+      // Handle v2 error responses
+      if ('error' in data && !('success' in data)) {
+        const errorData = data as V2ErrorResponse
+        this.handleError(response.status, errorData.error)
+      }
+
+      // Handle HTTP error status codes
+      if (!response.ok) {
+        this.handleError(response.status, data.error || response.statusText)
+      }
+
+      return data as T
     } catch (error) {
-      console.error(`[BlogFlow SDK] Request failed: ${url}`, error);
-      throw error;
+      if (error instanceof BlogFlowError) {
+        throw error
+      }
+      if (error instanceof Error) {
+        throw new BlogFlowError(`Request failed: ${error.message}`)
+      }
+      throw new BlogFlowError('Unknown error occurred')
     }
   }
 
   /**
-   * 获取文章列表
+   * Handle API errors with appropriate error types
    */
-  async getPosts(params: GetPostsParams = {}): Promise<BlogPost[]> {
-    const searchParams = new URLSearchParams();
-    if (params.page) searchParams.append('page', params.page.toString());
-    if (params.limit) searchParams.append('limit', params.limit.toString());
-    if (params.tag) searchParams.append('tag', params.tag);
-
-    return this.request<BlogPost[]>(`/posts?${searchParams.toString()}`, {
-      next: { revalidate: 600 } // Next.js 特性：默认缓存 10 分钟
-    } as any);
+  private handleError(status: number, message: string, details?: string): never {
+    switch (status) {
+      case 401:
+        throw new BlogFlowAuthError(message)
+      case 404:
+        throw new BlogFlowNotFoundError(message)
+      case 500:
+        throw new BlogFlowServerError(message, details)
+      default:
+        throw new BlogFlowError(message, status, details)
+    }
   }
 
   /**
-   * 获取单篇文章详情
+   * Build query string from parameters
    */
-  async getPostBySlug(slug: string): Promise<BlogPost | null> {
-    try {
-      return await this.request<BlogPost>(`/posts/${slug}`, {
-         next: { revalidate: 3600 } // 详情页缓存 1 小时
-      } as any);
-    } catch (error) {
-      return null; // 找不到返回 null，不报错
+  private buildQueryString(params: Record<string, any>): string {
+    const searchParams = new URLSearchParams()
+    for (const [key, value] of Object.entries(params)) {
+      if (value !== undefined && value !== null) {
+        searchParams.append(key, String(value))
+      }
     }
+    return searchParams.toString()
+  }
+
+  // ============================================================================
+  // API v2 Methods
+  // ============================================================================
+
+  /**
+   * Get posts list - Minimal, fast response
+   * 
+   * @param params Query parameters
+   * @returns Array of post list items
+   * 
+   * @example
+   * ```typescript
+   * const posts = await client.getPosts({ lang: 'zh', limit: 20, offset: 0 })
+   * ```
+   */
+  async getPosts(params: V2GetPostsParams = {}): Promise<V2PostListItem[]> {
+    const queryParams: Record<string, any> = {}
+    
+    if (params.lang !== undefined) queryParams.lang = params.lang
+    else if (this.defaultLanguage) queryParams.lang = this.defaultLanguage
+    
+    if (params.limit !== undefined) queryParams.limit = params.limit
+    if (params.offset !== undefined) queryParams.offset = params.offset
+    if (params.sort) queryParams.sort = params.sort
+    if (params.order) queryParams.order = params.order
+
+    const queryString = this.buildQueryString(queryParams)
+    const endpoint = `/posts${queryString ? `?${queryString}` : ''}`
+
+    return this.request<V2PostListItem[]>(endpoint)
+  }
+
+  /**
+   * Get single post by slug - Full content
+   * 
+   * @param slug Post slug
+   * @param options Additional options
+   * @returns Full post object with complete content
+   * 
+   * @example
+   * ```typescript
+   * const post = await client.getPost('my-article-slug', { lang: 'zh' })
+   * ```
+   */
+  async getPost(
+    slug: string,
+    options: { lang?: SupportedLanguage } = {}
+  ): Promise<V2Post> {
+    if (!slug) {
+      throw new Error('BlogFlow: Post slug is required')
+    }
+
+    const queryParams: Record<string, any> = {}
+    if (options.lang !== undefined) {
+      queryParams.lang = options.lang
+    } else if (this.defaultLanguage) {
+      queryParams.lang = this.defaultLanguage
+    }
+
+    const queryString = this.buildQueryString(queryParams)
+    const endpoint = `/posts/${slug}${queryString ? `?${queryString}` : ''}`
+
+    return this.request<V2Post>(endpoint)
   }
 }

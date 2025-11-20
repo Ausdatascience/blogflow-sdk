@@ -1,0 +1,63 @@
+# Source files
+src/
+*.ts
+!*.d.ts
+
+# Development files
+tsconfig.json
+tsup.config.ts
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Documentation (optional - you may want to include README.md)
+# README.md
+# LICENSE
+
+# Development
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Testing
+test/
+tests/
+__tests__/
+*.test.ts
+*.spec.ts
+coverage/
+
+# Build tools
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Temporary files
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db
+
+# Only include dist/ in the published package
+# The "files" field in package.json already handles this,
+# but .npmignore provides an extra layer of control
+
