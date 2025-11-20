@@ -4,10 +4,10 @@
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react'
-import { V2PostListItem, V2GetPostsParams, SupportedLanguage } from '../../core'
+import { V2PostListItem, V2GetPostsParams, V2GetPaginatedPostsParams, SupportedLanguage } from '../../core'
 import { useBlogFlowClient } from '../context/BlogFlowContext'
 
-export interface UseBlogPostsOptions extends Omit<V2GetPostsParams, 'lang'> {
+export interface UseBlogPostsOptions extends Omit<V2GetPaginatedPostsParams, 'lang'> {
   lang?: SupportedLanguage
   page?: number
   pageSize?: number
@@ -68,34 +68,28 @@ export function useBlogPosts(options: UseBlogPostsOptions = {}): UseBlogPostsRet
       setLoading(true)
       setError(null)
 
-      const offset = (targetPage - 1) * pageSize
-      const params: V2GetPostsParams = {
+      const params: V2GetPaginatedPostsParams = {
         ...stableQueryParams,
-        limit: pageSize,
-        offset,
+        page: targetPage,
+        pageSize,
       }
 
       if (lang !== undefined) {
         params.lang = lang
       }
 
-      const data = await client.getPosts(params)
+      const response = await client.getPaginatedPosts(params)
 
       if (append) {
-        setPosts(prev => [...prev, ...data])
+        setPosts(prev => [...prev, ...response.items])
       } else {
-        setPosts(data)
+        setPosts(response.items)
       }
 
-      const receivedCount = data.length
-      setHasMore(receivedCount === pageSize)
-      setTotalCount(prev => {
-        if (append) {
-          return prev + receivedCount
-        }
-        return (targetPage - 1) * pageSize + receivedCount
-      })
-      setCurrentPage(targetPage)
+      // Use real totalCount from API response
+      setTotalCount(response.totalCount)
+      setHasMore(targetPage < Math.ceil(response.totalCount / response.pageSize))
+      setCurrentPage(response.page)
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred'
       setError(errorMessage)
