@@ -26,6 +26,8 @@ export interface BlogFlowConfig {
 // API v2 Types
 // ============================================================================
 
+export type SearchField = 'title' | 'excerpt' | 'category' | 'slug'
+
 export interface V2GetPostsParams {
   /** Language code */
   lang?: SupportedLanguage
@@ -37,6 +39,10 @@ export interface V2GetPostsParams {
   sort?: 'id' | 'created_at' | 'updated_at'
   /** Sort order: 'asc' or 'desc' */
   order?: 'asc' | 'desc'
+  /** Search keyword to filter posts */
+  search?: string
+  /** Fields to search in (default: ['title', 'excerpt', 'category']) */
+  searchFields?: SearchField[]
 }
 
 export interface V2PostListItem {

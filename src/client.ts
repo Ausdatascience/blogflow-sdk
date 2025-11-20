@@ -125,25 +125,38 @@ export class BlogFlow {
 
   /**
    * Get posts list - Minimal, fast response
-   * 
+   *
    * @param params Query parameters
    * @returns Array of post list items
-   * 
+   *
    * @example
    * ```typescript
    * const posts = await client.getPosts({ lang: 'zh', limit: 20, offset: 0 })
+   *
+   * // Server-side search
+   * const searchResults = await client.getPosts({ search: 'react' })
+   * const titleSearch = await client.getPosts({
+   *   search: 'javascript',
+   *   searchFields: ['title']
+   * })
    * ```
    */
   async getPosts(params: V2GetPostsParams = {}): Promise<V2PostListItem[]> {
     const queryParams: Record<string, any> = {}
-    
+
     if (params.lang !== undefined) queryParams.lang = params.lang
     else if (this.defaultLanguage) queryParams.lang = this.defaultLanguage
-    
+
     if (params.limit !== undefined) queryParams.limit = params.limit
     if (params.offset !== undefined) queryParams.offset = params.offset
     if (params.sort) queryParams.sort = params.sort
     if (params.order) queryParams.order = params.order
+
+    // Search parameters
+    if (params.search) queryParams.search = params.search
+    if (params.searchFields && params.searchFields.length > 0) {
+      queryParams.searchFields = params.searchFields.join(',')
+    }
 
     const queryString = this.buildQueryString(queryParams)
     const endpoint = `/posts${queryString ? `?${queryString}` : ''}`

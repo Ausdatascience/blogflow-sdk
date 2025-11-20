@@ -17,6 +17,9 @@ export type { UseBlogPostOptions, UseBlogPostReturn } from './hooks/useBlogPost'
 export { useBlogSearch } from './hooks/useBlogSearch'
 export type { UseBlogSearchOptions, UseBlogSearchReturn } from './hooks/useBlogSearch'
 
+export { useServerSearch } from './hooks/useServerSearch'
+export type { UseServerSearchOptions, UseServerSearchReturn } from './hooks/useServerSearch'
+
 // Components
 export { BlogPostCard } from './components/BlogPostCard'
 export type { BlogPostCardProps } from './components/BlogPostCard'
@@ -34,5 +37,6 @@ export type {
   V2GetPostsParams,
   SupportedLanguage,
   BlogFlowConfig,
+  SearchField,
 } from '../core'
 
