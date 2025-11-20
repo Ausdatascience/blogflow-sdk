@@ -2,7 +2,7 @@
 import { BlogFlowConfig, BlogPost, GetPostsParams } from './types';
 
 // 🚨 这里的地址要换成你 BlogFlow 后端真实的 API 地址
-const DEFAULT_API_URL = "https://api.blogflow.com.au/v1"; 
+const DEFAULT_API_URL = "https://bloglink-api-sql.vercel.app/v2"; 
 
 export class BlogFlow {
   private apiKey: string;
