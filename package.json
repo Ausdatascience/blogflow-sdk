@@ -1,6 +1,6 @@
 {
   "name": "@blogflow/sdk",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "TypeScript SDK for BlogFlow API Server v2 - A lightweight client for fetching blog posts with multilingual support",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
