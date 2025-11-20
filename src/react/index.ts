@@ -15,7 +15,7 @@ export { useBlogPost } from './hooks/useBlogPost'
 export type { UseBlogPostOptions, UseBlogPostReturn } from './hooks/useBlogPost'
 
 export { useBlogSearch } from './hooks/useBlogSearch'
-export type { UseBlogSearchOptions, UseBlogSearchReturn } from './hooks/useBlogSearch'
+export type { UseBlogSearchOptions, UseBlogSearchReturn, SearchMode } from './hooks/useBlogSearch'
 
 export { useServerSearch } from './hooks/useServerSearch'
 export type { UseServerSearchOptions, UseServerSearchReturn } from './hooks/useServerSearch'
