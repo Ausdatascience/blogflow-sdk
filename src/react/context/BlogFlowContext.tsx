@@ -3,8 +3,10 @@
  * Provides BlogFlow client instance to React components
  */
 
-import { createContext, useContext, ReactNode, useMemo } from 'react'
+import { createContext, useContext, ReactNode, useMemo, useEffect } from 'react'
 import { BlogFlow, BlogFlowConfig } from '../../core'
+import { injectThemeStyles, removeThemeStyles } from '../../styles'
+import type { StylesConfig } from '../../styles/types'
 
 interface BlogFlowContextValue {
   client: BlogFlow
@@ -13,7 +15,13 @@ interface BlogFlowContextValue {
 const BlogFlowContext = createContext<BlogFlowContextValue | null>(null)
 
 export interface BlogFlowProviderProps {
-  config: BlogFlowConfig
+  config: BlogFlowConfig & {
+    /**
+     * Styling configuration
+     * @default { theme: 'default', autoInject: true }
+     */
+    styles?: StylesConfig
+  }
   children: ReactNode
 }
 
@@ -24,9 +32,34 @@ export interface BlogFlowProviderProps {
  * ```tsx
  * import { BlogFlowProvider } from '@blogflow/sdk/react'
  * 
+ * // Zero-config usage (default theme auto-injected)
  * function App() {
  *   return (
  *     <BlogFlowProvider config={{ apiKey: 'your-api-key' }}>
+ *       <YourComponent />
+ *     </BlogFlowProvider>
+ *   )
+ * }
+ * 
+ * // Custom theme
+ * function App() {
+ *   return (
+ *     <BlogFlowProvider config={{ 
+ *       apiKey: 'your-api-key',
+ *       styles: { theme: 'dark' }
+ *     }}>
+ *       <YourComponent />
+ *     </BlogFlowProvider>
+ *   )
+ * }
+ * 
+ * // Disable auto-inject (use external CSS)
+ * function App() {
+ *   return (
+ *     <BlogFlowProvider config={{ 
+ *       apiKey: 'your-api-key',
+ *       styles: { theme: 'none' }
+ *     }}>
  *       <YourComponent />
  *     </BlogFlowProvider>
  *   )
@@ -43,6 +76,28 @@ export function BlogFlowProvider({ config, children }: BlogFlowProviderProps) {
       }),
     [config.apiKey, config.baseUrl, config.defaultLanguage]
   )
+
+  // Handle theme injection
+  const stylesConfig = config.styles || {}
+  const theme = stylesConfig.theme || 'default'
+  const autoInject = stylesConfig.autoInject !== false // Default to true
+  const themeVars = stylesConfig.themeVars
+
+  useEffect(() => {
+    if (!autoInject || theme === 'none') {
+      return
+    }
+
+    // Inject theme styles
+    const styleId = injectThemeStyles(theme, themeVars)
+
+    // Cleanup on unmount or theme change
+    return () => {
+      if (styleId) {
+        removeThemeStyles(styleId)
+      }
+    }
+  }, [theme, autoInject, themeVars])
 
   return (
     <BlogFlowContext.Provider value={{ client }}>

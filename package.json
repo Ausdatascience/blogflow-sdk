@@ -21,13 +21,15 @@
       "types": "./dist/react.d.ts",
       "import": "./dist/react.js",
       "require": "./dist/react.cjs"
-    }
+    },
+    "./styles/*.css": "./dist/styles/*.css"
   },
   "files": [
     "dist"
   ],
   "scripts": {
     "build": "tsup",
+    "build:css": "tsx scripts/generate-css.ts",
     "dev": "tsup --watch",
     "prepublishOnly": "npm run build",
     "prepack": "npm run build",
@@ -67,9 +69,11 @@
     "react-dom": ">=16.8.0"
   },
   "devDependencies": {
+    "@types/node": "^22.0.0",
     "@types/react": "^19.2.6",
     "@types/react-dom": "^19.2.3",
     "tsup": "^8.5.1",
+    "tsx": "^4.19.0",
     "typescript": "^5.9.3"
   }
 }

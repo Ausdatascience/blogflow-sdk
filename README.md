@@ -5,16 +5,17 @@
 
 TypeScript SDK for BlogFlow API Server v2 - A lightweight, high-performance client for fetching blog posts with **server-side search**, **Next.js ISR caching**, and **multilingual support**.
 
-## ✨ Key Features (v0.4.2)
+## ✨ Key Features (v0.5.0)
 
 - 🚀 **Server-Side Search** - Search entire database, not just loaded posts (10-100x faster)
 - ⚡ **Next.js ISR Caching** - Reduce API requests by 98%+ with Incremental Static Regeneration
 - 🎯 **React Hooks** - `useBlogPosts`, `useBlogPost`, `useBlogSearch` with auto-debouncing
 - 🌍 **Multilingual** - Support for 7 languages (en, zh, es, fr, de, ja, ko)
 - 📦 **TypeScript First** - Full type safety with comprehensive type definitions
-- 🎨 **Customizable Components** - Pre-built React components with `className` support
+- 🎨 **Built-in Themes** - **NEW** - 4 beautiful themes with zero-config styling
+- 🎭 **Auto-Inject Styles** - **NEW** - Automatic CSS injection, no manual imports needed
+- 🔧 **Fully Customizable** - Pre-built React components with `className` support
 - 🔒 **SSR Ready** - Works in Node.js, Next.js server components, and browsers
-- 🛠️ **0.4.2 Reliability** - Fixes for pagination auto-refresh, accurate counts, and stable provider instances
 
 ## Installation
 
@@ -26,34 +27,62 @@ yarn add @blogflow/sdk
 pnpm add @blogflow/sdk
 ```
 
-### Styling (Optional)
+### 🎨 Styling (Zero-Config)
 
-BlogFlow SDK components **do not include default styles** to avoid conflicts with your design system. You need to provide styles yourself:
+**NEW in v0.5.0:** BlogFlow SDK now includes **automatic style injection** with 4 built-in themes!
 
-**Option 1: Use Recommended Styles (Copy & Paste)**
-
-Copy the styles from [`styles/recommended.css`](./styles/recommended.css) to your project:
-
-```typescript
-// app/globals.css or similar
-@import './blogflow-sdk.css';  // Copy recommended.css to your project
-```
-
-**Option 2: Custom Styles with Tailwind/CSS Modules**
-
+**Zero-Config Usage (Default Theme):**
 ```tsx
-<BlogPostList
-  posts={posts}
-  className="grid grid-cols-1 md:grid-cols-3 gap-6"
-  itemClassName="bg-white rounded-lg shadow p-4"
-/>
+import { BlogFlowProvider, BlogPostList } from '@blogflow/sdk/react'
+
+<BlogFlowProvider config={{ apiKey: 'your-key' }}>
+  <BlogPostList posts={posts} />  {/* ✅ Styled automatically! */}
+</BlogFlowProvider>
 ```
 
-📖 **[Complete Styling Guide](./STYLING_GUIDE.md)** - Learn about all CSS classes, customization options, and best practices.
+**Choose a Theme:**
+```tsx
+<BlogFlowProvider config={{ 
+  apiKey: 'your-key',
+  styles: { theme: 'dark' }  // 'default' | 'minimal' | 'modern' | 'dark'
+}}>
+  <BlogPostList posts={posts} />
+</BlogFlowProvider>
+```
+
+**Use External CSS (Better Performance):**
+```tsx
+import '@blogflow/sdk/styles/default.css'  // Import once
+
+<BlogFlowProvider config={{ 
+  apiKey: 'your-key',
+  styles: { theme: 'none' }  // Disable auto-inject
+}}>
+  <BlogPostList posts={posts} />
+</BlogFlowProvider>
+```
+
+**Custom Styling:**
+```tsx
+<BlogFlowProvider config={{ 
+  apiKey: 'your-key',
+  styles: { 
+    theme: 'default',
+    themeVars: {
+      primaryColor: '#ff6b6b',
+      borderRadius: '12px'
+    }
+  }
+}}>
+  <BlogPostList posts={posts} />
+</BlogFlowProvider>
+```
+
+📖 **[Complete Styling Guide](./STYLING_GUIDE.md)** - Learn about all themes, customization options, and best practices.
 
 > 📖 **Documentation**:
 > - [Complete Usage Guide](./USAGE.md)
-> - [Styling Guide](./STYLING_GUIDE.md) - **NEW** - CSS customization guide
+> - [Styling Guide](./STYLING_GUIDE.md) - **NEW** - Themes & customization
 > - [Caching & Performance Guide](./CACHING_GUIDE.md) - Reduce API pressure by 98%
 > - [Server-Side Search Examples](./SERVER_SEARCH_EXAMPLE.md)
 > - [Migration to v0.4.0](./MIGRATION_0.4.0.md)
