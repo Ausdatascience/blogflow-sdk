@@ -272,6 +272,9 @@ export function generateCSS(theme: Theme, customVars?: ThemeVars, stylesConfig?:
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: var(--blogflow-space-sm);
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 @media (min-width: 640px) {
@@ -294,6 +297,8 @@ export function generateCSS(theme: Theme, customVars?: ThemeVars, stylesConfig?:
 
 .blog-post-dense-item {
   transition: transform var(--blogflow-transition-normal);
+  min-width: 0;
+  overflow: hidden;
 }
 
 .blog-post-dense-item:hover {
@@ -302,6 +307,8 @@ export function generateCSS(theme: Theme, customVars?: ThemeVars, stylesConfig?:
 
 .blog-post-dense-item .blog-post-card {
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 /* ========================================
