@@ -6,7 +6,7 @@
 import { ChangeEvent, KeyboardEvent } from 'react'
 import { SupportedLanguage } from '../../core'
 
-export type PaginationVariant = 'text' | 'icon' | 'mixed'
+export type PaginationVariant = 'text' | 'icon' | 'mixed' | 'simple'
 
 export interface PaginationProps {
   currentPage: number
@@ -232,6 +232,41 @@ export function Pagination({
 
   if (totalPages <= 1) {
     return null
+  }
+
+  // Simple mode: only show page numbers
+  if (variant === 'simple') {
+    return (
+      <div className={`blog-pagination blog-pagination-variant-simple ${className}`}>
+        <div className="blog-pagination-controls">
+          {visiblePages.map((page, index) => {
+            if (page === 'ellipsis') {
+              return (
+                <span key={`ellipsis-${index}`} className="blog-pagination-ellipsis">
+                  ...
+                </span>
+              )
+            }
+
+            return (
+              <button
+                key={page}
+                type="button"
+                onClick={() => onPageChange(page)}
+                disabled={loading}
+                className={`blog-pagination-button blog-pagination-button-page ${
+                  currentPage === page ? 'blog-pagination-button-active' : ''
+                }`}
+                aria-label={`${t.page} ${page}`}
+                aria-current={currentPage === page ? 'page' : undefined}
+              >
+                {page}
+              </button>
+            )
+          })}
+        </div>
+      </div>
+    )
   }
 
   // Determine button content based on variant

@@ -70,7 +70,7 @@ export function BlogPostCard({
 
   return (
     <article
-      className={className}
+      className={`blog-post-card ${className}`.trim()}
       onClick={handleClick}
       role={onPostClick ? 'button' : undefined}
       tabIndex={onPostClick ? 0 : undefined}

@@ -61,15 +61,15 @@ export function BlogSearch({
 
   const showingText = resultCount !== undefined && totalCount !== undefined
     ? language === 'zh'
-      ? `Showing ${resultCount} of ${totalCount} posts`
-      : `Showing ${resultCount} of ${totalCount} posts`
+      ? `显示 ${resultCount} / ${totalCount}`
+      : `Showing ${resultCount} / ${totalCount}`
     : null
 
   return (
     <div className={`blog-search ${className}`}>
       <div className="blog-search-header">
         <h1 className="blog-search-title">
-          {language === 'zh' ? 'Blog Posts' : 'Blog Posts'}
+          {language === 'zh' ? '文章' : 'Posts'}
         </h1>
         {showingText && (
           <p className="blog-search-count">{showingText}</p>

@@ -74,9 +74,11 @@ export interface ThemeVars {
   backgroundColor?: string
   textColor?: string
   borderColor?: string
+  borderWidth?: string // 边框线宽度，如 '1px', '2px', '0' (无边框)
   borderRadius?: string
   spacing?: string
   fontFamily?: string
+  cardShadow?: boolean | number // 卡片阴影：布尔值或数字（0=关闭，1-3=强度）
 }
 
 export interface StylesConfig {
@@ -102,5 +104,29 @@ export interface StylesConfig {
    * @default 'blog-post'
    */
   classNamePrefix?: string
+  
+  /**
+   * Card border width
+   * @default '1px'
+   */
+  cardBorderWidth?: string
+  
+  /**
+   * Card border radius
+   * @default undefined (uses theme default)
+   */
+  cardBorderRadius?: string
+  
+  /**
+   * Card border color
+   * @default undefined (uses theme default)
+   */
+  cardBorderColor?: string
+  
+  /**
+   * Card shadow enabled (boolean) or intensity (number: 0=off, 1-10=intensity)
+   * @default true
+   */
+  cardShadow?: boolean | number
 }
 

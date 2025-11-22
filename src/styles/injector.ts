@@ -5,7 +5,7 @@
 
 import { generateCSS } from './generator'
 import { getTheme } from './themes'
-import type { ThemeName, ThemeVars } from './types'
+import type { ThemeName, ThemeVars, StylesConfig } from './types'
 
 // Track injected styles to avoid duplicates
 const injectedThemes = new Set<string>()
@@ -20,7 +20,8 @@ const injectedThemes = new Set<string>()
 export function injectThemeStyles(
   themeName: ThemeName,
   customVars?: ThemeVars,
-  replaceExisting: boolean = true
+  replaceExisting: boolean = true,
+  stylesConfig?: Pick<StylesConfig, 'cardBorderWidth' | 'cardBorderRadius' | 'cardBorderColor' | 'cardShadow'>
 ): string | null {
   // Skip if theme is 'none'
   if (themeName === 'none') {
@@ -40,7 +41,8 @@ export function injectThemeStyles(
   // Generate unique ID for this theme configuration
   const themeId = `blogflow-theme-${themeName}`
   const customId = customVars ? `-custom-${JSON.stringify(customVars)}` : ''
-  const styleId = `${themeId}${customId}`
+  const stylesConfigId = stylesConfig ? `-styles-${JSON.stringify(stylesConfig)}` : ''
+  const styleId = `${themeId}${customId}${stylesConfigId}`
 
   // Check if already injected (after removal, this should be false)
   if (injectedThemes.has(styleId)) {
@@ -57,11 +59,22 @@ export function injectThemeStyles(
   const theme = getTheme(themeName)
   if (!theme) {
     console.warn(`[BlogFlow] Theme "${themeName}" not found, falling back to default`)
-    return injectThemeStyles('default', customVars, replaceExisting)
+    return injectThemeStyles('default', customVars, replaceExisting, stylesConfig)
   }
 
   // Generate CSS
-  const css = generateCSS(theme, customVars)
+  const css = generateCSS(theme, customVars, stylesConfig)
+  
+  // Debug log for shadow intensity (development only)
+  if (process.env.NODE_ENV === 'development' && stylesConfig?.cardShadow !== undefined) {
+    console.log(`[BlogFlow] Shadow config:`, {
+      cardShadow: stylesConfig.cardShadow,
+      type: typeof stylesConfig.cardShadow,
+      shadowIntensity: typeof stylesConfig.cardShadow === 'number' 
+        ? Math.min(3, Math.max(0, Math.floor(stylesConfig.cardShadow)))
+        : (stylesConfig.cardShadow ? 2 : 0)
+    })
+  }
 
   // Create and inject style element
   const styleElement = document.createElement('style')

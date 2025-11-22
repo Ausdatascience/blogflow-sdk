@@ -5,7 +5,7 @@
 
 import type { Theme, ThemeVars } from './types'
 
-export function generateCSS(theme: Theme, customVars?: ThemeVars): string {
+export function generateCSS(theme: Theme, customVars?: ThemeVars, stylesConfig?: { cardBorderWidth?: string; cardBorderRadius?: string; cardBorderColor?: string; cardShadow?: boolean | number }): string {
   // Apply custom variable overrides
   const colors = {
     primary: customVars?.primaryColor || theme.colors.primary,
@@ -16,8 +16,24 @@ export function generateCSS(theme: Theme, customVars?: ThemeVars): string {
   }
   
   const borderRadius = customVars?.borderRadius || theme.borderRadius.md
+  const cardBorderRadius = stylesConfig?.cardBorderRadius || customVars?.borderRadius || theme.borderRadius.md
+  // 处理 borderWidth：如果为 '0'、'0px' 或空字符串，则设为 '0'
+  const borderWidthRaw = customVars?.borderWidth || stylesConfig?.cardBorderWidth || '1px'
+  const borderWidthValue = borderWidthRaw.trim()
+  const borderWidth = (borderWidthValue === '0' || borderWidthValue === '0px' || borderWidthValue === '') ? '0' : borderWidthRaw
+  // 处理边框颜色
+  const cardBorderColor = stylesConfig?.cardBorderColor || customVars?.borderColor || 'var(--blogflow-border)'
   const spacing = customVars?.spacing || theme.spacing.md
   const fontFamily = customVars?.fontFamily || theme.fonts.sans
+  // 阴影控制：支持布尔值或数字（0=关闭，1-10=不同强度）
+  const cardShadowRaw = customVars?.cardShadow !== undefined ? customVars.cardShadow : (stylesConfig?.cardShadow !== undefined ? stylesConfig.cardShadow : true)
+  // shadowIntensity: 如果是数字，直接使用（0-10），如果是布尔值，true=5, false=0
+  // 映射：0=无, 1-2=sm, 3-4=md, 5-6=lg, 7-8=xl, 9-10=2xl
+  const shadowIntensityRaw = typeof cardShadowRaw === 'number' ? Math.min(10, Math.max(0, Math.floor(cardShadowRaw))) : (cardShadowRaw ? 5 : 0)
+  const shadowIntensity = shadowIntensityRaw
+  
+  // For default theme, try to use website's global CSS variables with fallbacks
+  const useWebsiteColors = theme.name === 'default'
   
   return `
 /* BlogFlow SDK - ${theme.name} Theme */
@@ -25,7 +41,19 @@ export function generateCSS(theme: Theme, customVars?: ThemeVars): string {
 
 :root {
   /* Colors */
-  --blogflow-primary: ${colors.primary};
+  ${useWebsiteColors 
+    ? `/* Default theme: Attempts to use website's global colors with fallbacks */
+  --blogflow-primary: var(--primary, var(--color-primary, var(--accent, ${colors.primary})));
+  --blogflow-bg: var(--background, var(--color-background, var(--bg, ${colors.background})));
+  --blogflow-bg-hover: var(--background-hover, var(--color-background-hover, var(--bg-hover, ${theme.colors.backgroundHover})));
+  --blogflow-text: var(--foreground, var(--color-foreground, var(--text, var(--color-text, ${colors.text}))));
+  --blogflow-text-secondary: var(--foreground-secondary, var(--color-foreground-secondary, var(--text-secondary, ${theme.colors.textSecondary})));
+  --blogflow-border: var(--border, var(--color-border, var(--border-color, ${colors.border})));
+  --blogflow-border-hover: var(--border-hover, var(--color-border-hover, ${theme.colors.borderHover}));
+  --blogflow-category-bg: var(--category-bg, var(--color-category-bg, ${theme.colors.categoryBg}));
+  --blogflow-category-text: var(--category-text, var(--color-category-text, ${theme.colors.categoryText}));
+  --blogflow-shadow: var(--shadow, var(--color-shadow, ${theme.colors.shadow}));`
+    : `--blogflow-primary: ${colors.primary};
   --blogflow-bg: ${colors.background};
   --blogflow-bg-hover: ${theme.colors.backgroundHover};
   --blogflow-text: ${colors.text};
@@ -34,7 +62,8 @@ export function generateCSS(theme: Theme, customVars?: ThemeVars): string {
   --blogflow-border-hover: ${theme.colors.borderHover};
   --blogflow-category-bg: ${theme.colors.categoryBg};
   --blogflow-category-text: ${theme.colors.categoryText};
-  --blogflow-shadow: ${theme.colors.shadow};
+  --blogflow-shadow: ${theme.colors.shadow};`
+  }
   
   /* Spacing */
   --blogflow-space-xs: ${theme.spacing.xs};
@@ -52,6 +81,8 @@ export function generateCSS(theme: Theme, customVars?: ThemeVars): string {
   --blogflow-shadow-sm: ${theme.shadows.sm};
   --blogflow-shadow-md: ${theme.shadows.md};
   --blogflow-shadow-lg: ${theme.shadows.lg};
+  --blogflow-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+  --blogflow-shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   
   /* Transitions */
   --blogflow-transition-fast: ${theme.transitions.fast};
@@ -59,8 +90,12 @@ export function generateCSS(theme: Theme, customVars?: ThemeVars): string {
   --blogflow-transition-slow: ${theme.transitions.slow};
   
   /* Fonts */
-  --blogflow-font-sans: ${fontFamily};
-  --blogflow-font-mono: ${theme.fonts.mono};
+  ${useWebsiteColors
+    ? `--blogflow-font-sans: var(--font-family-base, var(--font-sans, var(--font-family, ${fontFamily})));
+  --blogflow-font-mono: var(--font-mono, var(--font-family-mono, ${theme.fonts.mono}));`
+    : `--blogflow-font-sans: ${fontFamily};
+  --blogflow-font-mono: ${theme.fonts.mono};`
+  }
   
   /* Font Sizes */
   --blogflow-text-xs: ${theme.fontSizes.xs};
@@ -100,6 +135,42 @@ export function generateCSS(theme: Theme, customVars?: ThemeVars): string {
 }
 
 /* ========================================
+   BlogPostList - Masonry View (Waterfall)
+   ======================================== */
+
+.blog-post-list-masonry {
+  column-count: 1;
+  column-gap: var(--blogflow-space-lg);
+  column-fill: balance;
+}
+
+.blog-post-list-masonry .blog-post-card {
+  break-inside: avoid;
+  page-break-inside: avoid;
+  margin-bottom: var(--blogflow-space-lg);
+  display: inline-block;
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .blog-post-list-masonry {
+    column-count: 2;
+  }
+}
+
+@media (min-width: 1024px) {
+  .blog-post-list-masonry {
+    column-count: 3;
+  }
+}
+
+@media (min-width: 1280px) {
+  .blog-post-list-masonry {
+    column-count: 4;
+  }
+}
+
+/* ========================================
    BlogPostList - Card View
    ======================================== */
 
@@ -124,15 +195,26 @@ export function generateCSS(theme: Theme, customVars?: ThemeVars): string {
   gap: var(--blogflow-space-md);
   padding: var(--blogflow-space-md);
   background: var(--blogflow-bg);
-  border-radius: var(--blogflow-radius-md);
-  border: 1px solid var(--blogflow-border);
+  border-radius: ${cardBorderRadius};
+  ${borderWidth !== '0' ? `border: ${borderWidth} solid ${cardBorderColor};` : 'border: none;'}
   cursor: pointer;
   transition: all var(--blogflow-transition-normal);
   font-family: var(--blogflow-font-sans);
+  ${shadowIntensity > 0 ? `box-shadow: var(--blogflow-shadow-${
+    shadowIntensity <= 2 ? 'sm' : 
+    shadowIntensity <= 4 ? 'md' : 
+    shadowIntensity <= 6 ? 'lg' : 
+    shadowIntensity <= 8 ? 'xl' : '2xl'
+  });` : `box-shadow: none;`}
 }
 
 .blog-post-list-item:hover {
-  box-shadow: var(--blogflow-shadow-md);
+  ${shadowIntensity > 0 ? `box-shadow: var(--blogflow-shadow-${
+    shadowIntensity <= 2 ? 'md' : 
+    shadowIntensity <= 4 ? 'lg' : 
+    shadowIntensity <= 6 ? 'xl' : 
+    shadowIntensity <= 8 ? '2xl' : '2xl'
+  });` : `box-shadow: none;`}
   border-color: var(--blogflow-border-hover);
   transform: translateY(-2px);
   background: var(--blogflow-bg-hover);
@@ -224,8 +306,8 @@ export function generateCSS(theme: Theme, customVars?: ThemeVars): string {
 
 .blog-post-card {
   background: var(--blogflow-bg);
-  border-radius: var(--blogflow-radius-md);
-  border: 1px solid var(--blogflow-border);
+  border-radius: ${cardBorderRadius};
+  ${borderWidth !== '0' ? `border: ${borderWidth} solid ${cardBorderColor};` : 'border: none;'}
   overflow: hidden;
   cursor: pointer;
   transition: all var(--blogflow-transition-normal);
@@ -233,10 +315,21 @@ export function generateCSS(theme: Theme, customVars?: ThemeVars): string {
   display: flex;
   flex-direction: column;
   font-family: var(--blogflow-font-sans);
+  ${shadowIntensity > 0 ? `box-shadow: var(--blogflow-shadow-${
+    shadowIntensity <= 2 ? 'sm' : 
+    shadowIntensity <= 4 ? 'md' : 
+    shadowIntensity <= 6 ? 'lg' : 
+    shadowIntensity <= 8 ? 'xl' : '2xl'
+  });` : `box-shadow: none;`}
 }
 
 .blog-post-card:hover {
-  box-shadow: var(--blogflow-shadow-lg);
+  ${shadowIntensity > 0 ? `box-shadow: var(--blogflow-shadow-${
+    shadowIntensity <= 2 ? 'md' : 
+    shadowIntensity <= 4 ? 'lg' : 
+    shadowIntensity <= 6 ? 'xl' : 
+    shadowIntensity <= 8 ? '2xl' : '2xl'
+  });` : `box-shadow: none;`}
   border-color: var(--blogflow-border-hover);
   transform: translateY(-4px);
 }
@@ -606,6 +699,76 @@ export function generateCSS(theme: Theme, customVars?: ThemeVars): string {
 /* Variant: Text Only */
 .blog-pagination-variant-text .blog-pagination-button {
   /* Default text styling */
+}
+
+/* Variant: Simple (Only page numbers) */
+.blog-pagination-variant-simple {
+  margin-top: var(--blogflow-space-lg);
+}
+
+.blog-pagination-variant-simple .blog-pagination-controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--blogflow-space-xs);
+}
+
+.blog-pagination-variant-simple .blog-pagination-button {
+  min-width: 2.5rem;
+  height: 2.5rem;
+  padding: var(--blogflow-space-xs) var(--blogflow-space-sm);
+  font-size: var(--blogflow-text-sm);
+  color: var(--blogflow-text);
+  background: var(--blogflow-bg);
+  border: 1px solid var(--blogflow-border);
+  border-radius: var(--blogflow-radius-md);
+  cursor: pointer;
+  transition: all var(--blogflow-transition-normal);
+  outline: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.blog-pagination-variant-simple .blog-pagination-button:hover:not(:disabled) {
+  background: var(--blogflow-bg-hover);
+  border-color: var(--blogflow-border-hover);
+  color: var(--blogflow-text);
+}
+
+.blog-pagination-variant-simple .blog-pagination-button:focus {
+  outline: 2px solid var(--blogflow-primary);
+  outline-offset: 2px;
+}
+
+.blog-pagination-variant-simple .blog-pagination-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.blog-pagination-variant-simple .blog-pagination-button-active {
+  background: var(--blogflow-primary);
+  color: #ffffff;
+  border-color: var(--blogflow-primary);
+  font-weight: 600;
+}
+
+.blog-pagination-variant-simple .blog-pagination-button-active:hover:not(:disabled) {
+  background: var(--blogflow-border-hover);
+  border-color: var(--blogflow-border-hover);
+  color: #ffffff;
+}
+
+.blog-pagination-variant-simple .blog-pagination-ellipsis {
+  padding: var(--blogflow-space-xs) var(--blogflow-space-sm);
+  color: var(--blogflow-text-secondary);
+  font-size: var(--blogflow-text-sm);
+  user-select: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.5rem;
+  height: 2.5rem;
 }
 
 .blog-pagination-ellipsis {

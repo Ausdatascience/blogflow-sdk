@@ -93,7 +93,17 @@ export function BlogFlowProvider({ config, children }: BlogFlowProviderProps) {
     }
 
     // Inject theme styles (replaceExisting=true ensures old themes are removed)
-    const styleId = injectThemeStyles(theme, themeVars, true)
+    const styleId = injectThemeStyles(
+      theme, 
+      themeVars, 
+      true,
+      {
+        cardBorderWidth: stylesConfig.cardBorderWidth,
+        cardBorderRadius: stylesConfig.cardBorderRadius,
+        cardBorderColor: stylesConfig.cardBorderColor,
+        cardShadow: stylesConfig.cardShadow,
+      }
+    )
 
     // Cleanup on unmount
     return () => {
@@ -101,7 +111,7 @@ export function BlogFlowProvider({ config, children }: BlogFlowProviderProps) {
         removeThemeStyles(styleId)
       }
     }
-  }, [theme, autoInject, themeVars])
+  }, [theme, autoInject, themeVars, stylesConfig.cardBorderWidth, stylesConfig.cardBorderRadius, stylesConfig.cardBorderColor, stylesConfig.cardShadow])
 
   return (
     <BlogFlowContext.Provider value={{ client }}>

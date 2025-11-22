@@ -12,7 +12,7 @@ export interface BlogPostListProps {
   onPostClick?: (slug: string) => void
   className?: string
   itemClassName?: string
-  viewMode?: 'card' | 'list' | 'grid'
+  viewMode?: 'card' | 'list' | 'grid' | 'masonry'
   cardProps?: Omit<BlogPostCardProps, 'post' | 'language' | 'onPostClick' | 'className'>
   emptyMessage?: string
 }
