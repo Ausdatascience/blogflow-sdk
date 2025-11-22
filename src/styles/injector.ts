@@ -14,11 +14,13 @@ const injectedThemes = new Set<string>()
  * Inject theme styles into the document head
  * @param themeName - Name of the theme to inject
  * @param customVars - Optional custom theme variables
+ * @param replaceExisting - If true, remove all existing themes before injecting
  * @returns The style element ID
  */
 export function injectThemeStyles(
   themeName: ThemeName,
-  customVars?: ThemeVars
+  customVars?: ThemeVars,
+  replaceExisting: boolean = true
 ): string | null {
   // Skip if theme is 'none'
   if (themeName === 'none') {
@@ -30,12 +32,17 @@ export function injectThemeStyles(
     return null
   }
 
+  // Remove all existing themes if replaceExisting is true
+  if (replaceExisting) {
+    removeAllThemeStyles()
+  }
+
   // Generate unique ID for this theme configuration
   const themeId = `blogflow-theme-${themeName}`
   const customId = customVars ? `-custom-${JSON.stringify(customVars)}` : ''
   const styleId = `${themeId}${customId}`
 
-  // Check if already injected
+  // Check if already injected (after removal, this should be false)
   if (injectedThemes.has(styleId)) {
     return styleId
   }
@@ -50,7 +57,7 @@ export function injectThemeStyles(
   const theme = getTheme(themeName)
   if (!theme) {
     console.warn(`[BlogFlow] Theme "${themeName}" not found, falling back to default`)
-    return injectThemeStyles('default', customVars)
+    return injectThemeStyles('default', customVars, replaceExisting)
   }
 
   // Generate CSS
@@ -67,6 +74,11 @@ export function injectThemeStyles(
 
   // Mark as injected
   injectedThemes.add(styleId)
+
+  // Debug log (only in development)
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`[BlogFlow] Theme "${themeName}" injected with ID: ${styleId}`)
+  }
 
   return styleId
 }
@@ -92,10 +104,16 @@ export function removeAllThemeStyles(): void {
   if (typeof document === 'undefined') return
 
   const styleElements = document.querySelectorAll('[data-blogflow-theme]')
+  const removedCount = styleElements.length
   styleElements.forEach((element) => {
     element.remove()
   })
   injectedThemes.clear()
+
+  // Debug log (only in development)
+  if (process.env.NODE_ENV === 'development' && removedCount > 0) {
+    console.log(`[BlogFlow] Removed ${removedCount} theme style(s)`)
+  }
 }
 
 /**

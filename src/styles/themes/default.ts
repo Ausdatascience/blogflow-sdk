@@ -10,15 +10,15 @@ export const defaultTheme: Theme = {
   
   colors: {
     primary: '#3b82f6',
-    background: '#ffffff',
-    backgroundHover: '#f9fafb',
-    text: '#111827',
-    textSecondary: '#6b7280',
-    border: '#e5e7eb',
-    borderHover: '#3b82f6',
+    background: '#f0f7ff', // 浅蓝色背景
+    backgroundHover: '#e0efff', // 稍深的蓝色背景
+    text: '#1e40af', // 深蓝色文字（更明显）
+    textSecondary: '#3b82f6', // 蓝色次要文字
+    border: '#3b82f6', // 蓝色边框
+    borderHover: '#2563eb', // 深蓝色 hover
     categoryBg: '#dbeafe',
     categoryText: '#1e40af',
-    shadow: 'rgba(0, 0, 0, 0.1)',
+    shadow: 'rgba(59, 130, 246, 0.15)', // 蓝色阴影
   },
   
   spacing: {

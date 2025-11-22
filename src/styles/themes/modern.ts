@@ -10,15 +10,15 @@ export const modernTheme: Theme = {
   
   colors: {
     primary: '#8b5cf6',
-    background: '#ffffff',
-    backgroundHover: '#faf5ff',
-    text: '#1f2937',
-    textSecondary: '#6b7280',
-    border: '#e9d5ff',
+    background: '#faf5ff', // 浅紫色背景（更明显）
+    backgroundHover: '#f3e8ff', // 稍深的紫色背景
+    text: '#6b21a8', // 深紫色文字（更明显）
+    textSecondary: '#8b5cf6', // 紫色次要文字
+    border: '#c4b5fd', // 紫色边框
     borderHover: '#8b5cf6',
-    categoryBg: '#f3e8ff',
+    categoryBg: '#ede9fe', // 紫色分类背景
     categoryText: '#6b21a8',
-    shadow: 'rgba(139, 92, 246, 0.15)',
+    shadow: 'rgba(139, 92, 246, 0.2)', // 紫色阴影
   },
   
   spacing: {

@@ -5,7 +5,7 @@
 
 import { createContext, useContext, ReactNode, useMemo, useEffect } from 'react'
 import { BlogFlow, BlogFlowConfig } from '../../core'
-import { injectThemeStyles, removeThemeStyles } from '../../styles'
+import { injectThemeStyles, removeThemeStyles, removeAllThemeStyles } from '../../styles'
 import type { StylesConfig } from '../../styles/types'
 
 interface BlogFlowContextValue {
@@ -85,15 +85,19 @@ export function BlogFlowProvider({ config, children }: BlogFlowProviderProps) {
 
   useEffect(() => {
     if (!autoInject || theme === 'none') {
+      // If disabled, remove all existing themes
+      if (typeof document !== 'undefined') {
+        removeAllThemeStyles()
+      }
       return
     }
 
-    // Inject theme styles
-    const styleId = injectThemeStyles(theme, themeVars)
+    // Inject theme styles (replaceExisting=true ensures old themes are removed)
+    const styleId = injectThemeStyles(theme, themeVars, true)
 
-    // Cleanup on unmount or theme change
+    // Cleanup on unmount
     return () => {
-      if (styleId) {
+      if (styleId && typeof document !== 'undefined') {
         removeThemeStyles(styleId)
       }
     }

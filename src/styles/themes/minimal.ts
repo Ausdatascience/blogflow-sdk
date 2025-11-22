@@ -10,15 +10,15 @@ export const minimalTheme: Theme = {
   
   colors: {
     primary: '#000000',
-    background: '#ffffff',
-    backgroundHover: '#f5f5f5',
-    text: '#000000',
-    textSecondary: '#737373',
-    border: '#e5e5e5',
+    background: '#f8f8f8', // 浅灰色背景（更明显）
+    backgroundHover: '#f0f0f0', // 稍深的灰色
+    text: '#1a1a1a', // 深灰色文字（更明显）
+    textSecondary: '#4a4a4a', // 中灰色次要文字
+    border: '#d4d4d4', // 灰色边框
     borderHover: '#000000',
-    categoryBg: '#f5f5f5',
+    categoryBg: '#e8e8e8', // 灰色分类背景
     categoryText: '#000000',
-    shadow: 'rgba(0, 0, 0, 0.05)',
+    shadow: 'rgba(0, 0, 0, 0.08)', // 稍深的阴影
   },
   
   spacing: {
