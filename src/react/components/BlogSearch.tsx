@@ -20,6 +20,8 @@ export interface BlogSearchProps {
   resultCount?: number
   totalCount?: number
   customActions?: ReactNode
+  showTitle?: boolean
+  showCount?: boolean
 }
 
 /**
@@ -50,6 +52,8 @@ export function BlogSearch({
   resultCount,
   totalCount,
   customActions,
+  showTitle = true,
+  showCount = true,
 }: BlogSearchProps) {
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     onSearchChange(e.target.value)
@@ -67,14 +71,18 @@ export function BlogSearch({
 
   return (
     <div className={`blog-search ${className}`}>
-      <div className="blog-search-header">
-        <h1 className="blog-search-title">
-          {language === 'zh' ? '文章' : 'Posts'}
-        </h1>
-        {showingText && (
-          <p className="blog-search-count">{showingText}</p>
-        )}
-      </div>
+      {(showTitle || showCount) && (
+        <div className="blog-search-header">
+          {showTitle && (
+            <h1 className="blog-search-title">
+              {language === 'zh' ? '文章' : 'Posts'}
+            </h1>
+          )}
+          {showCount && showingText && (
+            <p className="blog-search-count">{showingText}</p>
+          )}
+        </div>
+      )}
 
       <div className="blog-search-controls">
         <div className="blog-search-input-wrapper">

@@ -8,6 +8,11 @@ import { blueTheme } from './blue'
 import { minimalTheme } from './minimal'
 import { modernTheme } from './modern'
 import { darkTheme } from './dark'
+import { magicTheme } from './magic'
+import { fantasyTheme } from './fantasy'
+import { adventureTheme } from './adventure'
+import { tomorrowTheme } from './tomorrow'
+import { mainstreetTheme } from './mainstreet'
 import type { Theme, ThemeName } from '../types'
 
 export const themes: Record<Exclude<ThemeName, 'none'>, Theme> = {
@@ -16,6 +21,11 @@ export const themes: Record<Exclude<ThemeName, 'none'>, Theme> = {
   minimal: minimalTheme,
   modern: modernTheme,
   dark: darkTheme,
+  magic: magicTheme,
+  fantasy: fantasyTheme,
+  adventure: adventureTheme,
+  tomorrow: tomorrowTheme,
+  mainstreet: mainstreetTheme,
 }
 
 export function getTheme(name: ThemeName): Theme | null {
@@ -23,5 +33,16 @@ export function getTheme(name: ThemeName): Theme | null {
   return themes[name] || themes.default
 }
 
-export { defaultTheme, blueTheme, minimalTheme, modernTheme, darkTheme }
+export { 
+  defaultTheme, 
+  blueTheme, 
+  minimalTheme, 
+  modernTheme, 
+  darkTheme,
+  magicTheme,
+  fantasyTheme,
+  adventureTheme,
+  tomorrowTheme,
+  mainstreetTheme,
+}
 

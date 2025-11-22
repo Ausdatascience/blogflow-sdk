@@ -52,7 +52,7 @@
     "cms"
   ],
   "author": "Ausdata Science Pty Ltd <https://ausdata.ai>",
-  "license": "ISC",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ausdata/blogflow-sdk.git"

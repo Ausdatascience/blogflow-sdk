@@ -5,6 +5,14 @@
 
 import { V2PostListItem, SupportedLanguage } from '../../core'
 import { BlogPostCard, BlogPostCardProps } from './BlogPostCard'
+import { BlogPostWaterfall } from './BlogPostWaterfall'
+import { BlogPostMagazine } from './BlogPostMagazine'
+import { BlogPostDense } from './BlogPostDense'
+import { BlogPostTimeline } from './BlogPostTimeline'
+import { BlogPostFullscreen } from './BlogPostFullscreen'
+import { BlogPostFast } from './BlogPostFast'
+import { BlogPostModern } from './BlogPostModern'
+import { BlogPostCarousel } from './BlogPostCarousel'
 
 export interface BlogPostListProps {
   posts: V2PostListItem[]
@@ -12,7 +20,7 @@ export interface BlogPostListProps {
   onPostClick?: (slug: string) => void
   className?: string
   itemClassName?: string
-  viewMode?: 'card' | 'list' | 'grid' | 'masonry'
+  viewMode?: 'card' | 'list' | 'grid' | 'masonry' | 'waterfall' | 'magazine' | 'dense' | 'timeline' | 'fullscreen' | 'fast' | 'modern' | 'carousel'
   cardProps?: Omit<BlogPostCardProps, 'post' | 'language' | 'onPostClick' | 'className'>
   emptyMessage?: string
 }
@@ -49,6 +57,108 @@ export function BlogPostList({
   }
 
   const containerClass = `blog-post-list blog-post-list-${viewMode} ${className}`
+
+  if (viewMode === 'waterfall') {
+    return (
+      <BlogPostWaterfall
+        posts={posts}
+        language={language}
+        onPostClick={onPostClick}
+        className={className}
+        itemClassName={itemClassName}
+        cardProps={cardProps}
+      />
+    )
+  }
+
+  if (viewMode === 'magazine') {
+    return (
+      <BlogPostMagazine
+        posts={posts}
+        language={language}
+        onPostClick={onPostClick}
+        className={className}
+        itemClassName={itemClassName}
+        cardProps={cardProps}
+      />
+    )
+  }
+
+  if (viewMode === 'dense') {
+    return (
+      <BlogPostDense
+        posts={posts}
+        language={language}
+        onPostClick={onPostClick}
+        className={className}
+        itemClassName={itemClassName}
+        cardProps={cardProps}
+      />
+    )
+  }
+
+  if (viewMode === 'timeline') {
+    return (
+      <BlogPostTimeline
+        posts={posts}
+        language={language}
+        onPostClick={onPostClick}
+        className={className}
+        itemClassName={itemClassName}
+        cardProps={cardProps}
+      />
+    )
+  }
+
+  if (viewMode === 'fullscreen') {
+    return (
+      <BlogPostFullscreen
+        posts={posts}
+        language={language}
+        onPostClick={onPostClick}
+        className={className}
+        itemClassName={itemClassName}
+      />
+    )
+  }
+
+  if (viewMode === 'fast') {
+    return (
+      <BlogPostFast
+        posts={posts}
+        language={language}
+        onPostClick={onPostClick}
+        className={className}
+        itemClassName={itemClassName}
+        cardProps={cardProps}
+      />
+    )
+  }
+
+  if (viewMode === 'modern') {
+    return (
+      <BlogPostModern
+        posts={posts}
+        language={language}
+        onPostClick={onPostClick}
+        className={className}
+        itemClassName={itemClassName}
+        cardProps={cardProps}
+      />
+    )
+  }
+
+  if (viewMode === 'carousel') {
+    return (
+      <BlogPostCarousel
+        posts={posts}
+        language={language}
+        onPostClick={onPostClick}
+        className={className}
+        itemClassName={itemClassName}
+      />
+    )
+  }
 
   if (viewMode === 'list') {
     return (

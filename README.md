@@ -1,7 +1,7 @@
 # BlogFlow SDK
 
 [![npm version](https://img.shields.io/npm/v/@blogflow/sdk.svg)](https://www.npmjs.com/package/@blogflow/sdk)
-[![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](https://opensource.org/licenses/ISC)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 TypeScript SDK for BlogFlow API Server v2 - A lightweight, high-performance client for fetching blog posts with **server-side search**, **Next.js ISR caching**, and **multilingual support**.
 
@@ -686,7 +686,7 @@ export function PostsList() {
 
 ## License
 
-ISC
+MIT
 
 ---
 
