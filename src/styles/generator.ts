@@ -474,11 +474,205 @@ export function generateCSS(theme: Theme, customVars?: ThemeVars): string {
 }
 
 /* ========================================
+   Pagination Component
+   ======================================== */
+
+.blog-pagination {
+  margin-top: var(--blogflow-space-xl);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--blogflow-space-md);
+  font-family: var(--blogflow-font-sans);
+}
+
+.blog-pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--blogflow-space-xs);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.blog-pagination-pages {
+  display: flex;
+  align-items: center;
+  gap: var(--blogflow-space-xs);
+}
+
+.blog-pagination-button {
+  padding: var(--blogflow-space-xs) var(--blogflow-space-sm);
+  min-width: 2.5rem;
+  font-size: var(--blogflow-text-sm);
+  font-family: var(--blogflow-font-sans);
+  font-weight: 500;
+  color: var(--blogflow-text);
+  background: var(--blogflow-bg);
+  border: 1px solid var(--blogflow-border);
+  border-radius: var(--blogflow-radius-md);
+  cursor: pointer;
+  transition: all var(--blogflow-transition-normal);
+  outline: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.blog-pagination-button:hover:not(:disabled) {
+  background: var(--blogflow-bg-hover);
+  border-color: var(--blogflow-border-hover);
+  color: var(--blogflow-text);
+  transform: translateY(-1px);
+  box-shadow: var(--blogflow-shadow-sm);
+}
+
+.blog-pagination-button:focus {
+  outline: 2px solid var(--blogflow-primary);
+  outline-offset: 2px;
+}
+
+.blog-pagination-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: var(--blogflow-bg-hover);
+  border-color: var(--blogflow-border);
+}
+
+.blog-pagination-button-active {
+  background: var(--blogflow-primary);
+  color: #ffffff;
+  border-color: var(--blogflow-primary);
+  font-weight: 600;
+}
+
+.blog-pagination-button-active:hover:not(:disabled) {
+  background: var(--blogflow-border-hover);
+  border-color: var(--blogflow-border-hover);
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: var(--blogflow-shadow-md);
+}
+
+.blog-pagination-button-first,
+.blog-pagination-button-last {
+  padding: var(--blogflow-space-xs) var(--blogflow-space-md);
+}
+
+.blog-pagination-button-prev,
+.blog-pagination-button-next {
+  padding: var(--blogflow-space-xs) var(--blogflow-space-md);
+  font-weight: 500;
+}
+
+.blog-pagination-button-text {
+  margin-left: var(--blogflow-space-xs);
+  margin-right: var(--blogflow-space-xs);
+}
+
+.blog-pagination-button svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* Variant: Icon Only */
+.blog-pagination-variant-icon .blog-pagination-button {
+  padding: var(--blogflow-space-xs);
+  min-width: 2.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.blog-pagination-variant-icon .blog-pagination-button svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Variant: Mixed (Icon + Text) */
+.blog-pagination-variant-mixed .blog-pagination-button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--blogflow-space-xs);
+}
+
+.blog-pagination-variant-mixed .blog-pagination-button svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Variant: Text Only */
+.blog-pagination-variant-text .blog-pagination-button {
+  /* Default text styling */
+}
+
+.blog-pagination-ellipsis {
+  padding: var(--blogflow-space-xs) var(--blogflow-space-sm);
+  color: var(--blogflow-text-secondary);
+  font-size: var(--blogflow-text-sm);
+  user-select: none;
+}
+
+.blog-pagination-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.blog-pagination-info-text {
+  font-size: var(--blogflow-text-sm);
+  color: var(--blogflow-text-secondary);
+}
+
+.blog-pagination-quick-jump {
+  display: flex;
+  align-items: center;
+  gap: var(--blogflow-space-xs);
+  font-size: var(--blogflow-text-sm);
+}
+
+.blog-pagination-quick-jump-label {
+  color: var(--blogflow-text-secondary);
+}
+
+.blog-pagination-quick-jump-input {
+  width: 4rem;
+  padding: var(--blogflow-space-xs) var(--blogflow-space-sm);
+  font-size: var(--blogflow-text-sm);
+  font-family: var(--blogflow-font-sans);
+  text-align: center;
+  color: var(--blogflow-text);
+  background: var(--blogflow-bg);
+  border: 1px solid var(--blogflow-border);
+  border-radius: var(--blogflow-radius-md);
+  transition: all var(--blogflow-transition-normal);
+  outline: none;
+}
+
+.blog-pagination-quick-jump-input:focus {
+  border-color: var(--blogflow-border-hover);
+  box-shadow: 0 0 0 3px var(--blogflow-shadow);
+  outline: none;
+}
+
+.blog-pagination-quick-jump-input::placeholder {
+  color: var(--blogflow-text-secondary);
+  opacity: 0.6;
+}
+
+.blog-pagination-quick-jump-suffix {
+  color: var(--blogflow-text-secondary);
+}
+
+/* ========================================
    Accessibility
    ======================================== */
 
 .blog-post-list-item:focus-visible,
-.blog-post-card:focus-visible {
+.blog-post-card:focus-visible,
+.blog-pagination-button:focus-visible {
   outline: 2px solid var(--blogflow-primary);
   outline-offset: 2px;
 }
@@ -491,12 +685,14 @@ export function generateCSS(theme: Theme, customVars?: ThemeVars): string {
   .blog-post-list-item,
   .blog-post-card,
   .blog-post-list-item-image img,
-  .blog-post-card-image-img {
+  .blog-post-card-image-img,
+  .blog-pagination-button {
     transition: none;
   }
 
   .blog-post-list-item:hover,
-  .blog-post-card:hover {
+  .blog-post-card:hover,
+  .blog-pagination-button:hover {
     transform: none;
   }
 
@@ -530,6 +726,41 @@ export function generateCSS(theme: Theme, customVars?: ThemeVars): string {
 
   .blog-post-card-title {
     font-size: var(--blogflow-text-lg);
+  }
+
+  .blog-pagination-controls {
+    gap: var(--blogflow-space-xs);
+  }
+
+  .blog-pagination-button {
+    padding: var(--blogflow-space-xs);
+    min-width: 2rem;
+    font-size: var(--blogflow-text-xs);
+  }
+
+  .blog-pagination-button-first,
+  .blog-pagination-button-last,
+  .blog-pagination-button-prev,
+  .blog-pagination-button-next {
+    padding: var(--blogflow-space-xs) var(--blogflow-space-sm);
+    font-size: var(--blogflow-text-xs);
+  }
+
+  .blog-pagination-pages {
+    gap: var(--blogflow-space-xs);
+  }
+
+  .blog-pagination-info {
+    font-size: var(--blogflow-text-xs);
+  }
+
+  .blog-pagination-quick-jump {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .blog-pagination-quick-jump-input {
+    width: 3rem;
   }
 }
 

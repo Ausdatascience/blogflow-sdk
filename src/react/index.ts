@@ -30,6 +30,9 @@ export type { BlogPostListProps } from './components/BlogPostList'
 export { BlogSearch } from './components/BlogSearch'
 export type { BlogSearchProps } from './components/BlogSearch'
 
+export { Pagination } from './components/Pagination'
+export type { PaginationProps } from './components/Pagination'
+
 // Re-export core types for convenience
 export type {
   V2PostListItem,

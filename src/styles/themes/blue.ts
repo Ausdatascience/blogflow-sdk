@@ -1,25 +1,24 @@
 /**
- * Default Theme - Neutral & Adaptive
- * Neutral colors that adapt to website's global color scheme
- * Best for seamless integration with existing designs
+ * Blue Theme - Blue & White
+ * Professional and clean design with blue accent colors
  */
 
 import type { Theme } from '../types'
 
-export const defaultTheme: Theme = {
-  name: 'default',
+export const blueTheme: Theme = {
+  name: 'blue',
   
   colors: {
-    primary: '#6b7280', // 中性灰色，适配大多数网站
-    background: '#ffffff', // 纯白背景，适配网站全局
-    backgroundHover: '#f9fafb', // 极浅灰色 hover
-    text: '#111827', // 深灰色文字，通用性强
-    textSecondary: '#6b7280', // 中性灰色次要文字
-    border: '#e5e7eb', // 浅灰色边框，不突兀
-    borderHover: '#9ca3af', // 中灰色 hover
-    categoryBg: '#f3f4f6', // 浅灰色分类背景
-    categoryText: '#374151', // 深灰色分类文字
-    shadow: 'rgba(0, 0, 0, 0.1)', // 通用阴影
+    primary: '#3b82f6',
+    background: '#f0f7ff', // 浅蓝色背景
+    backgroundHover: '#e0efff', // 稍深的蓝色背景
+    text: '#1e40af', // 深蓝色文字（更明显）
+    textSecondary: '#3b82f6', // 蓝色次要文字
+    border: '#3b82f6', // 蓝色边框
+    borderHover: '#2563eb', // 深蓝色 hover
+    categoryBg: '#dbeafe',
+    categoryText: '#1e40af',
+    shadow: 'rgba(59, 130, 246, 0.15)', // 蓝色阴影
   },
   
   spacing: {
