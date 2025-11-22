@@ -26,8 +26,34 @@ yarn add @blogflow/sdk
 pnpm add @blogflow/sdk
 ```
 
+### Styling (Optional)
+
+BlogFlow SDK components **do not include default styles** to avoid conflicts with your design system. You need to provide styles yourself:
+
+**Option 1: Use Recommended Styles (Copy & Paste)**
+
+Copy the styles from [`styles/recommended.css`](./styles/recommended.css) to your project:
+
+```typescript
+// app/globals.css or similar
+@import './blogflow-sdk.css';  // Copy recommended.css to your project
+```
+
+**Option 2: Custom Styles with Tailwind/CSS Modules**
+
+```tsx
+<BlogPostList
+  posts={posts}
+  className="grid grid-cols-1 md:grid-cols-3 gap-6"
+  itemClassName="bg-white rounded-lg shadow p-4"
+/>
+```
+
+📖 **[Complete Styling Guide](./STYLING_GUIDE.md)** - Learn about all CSS classes, customization options, and best practices.
+
 > 📖 **Documentation**:
 > - [Complete Usage Guide](./USAGE.md)
+> - [Styling Guide](./STYLING_GUIDE.md) - **NEW** - CSS customization guide
 > - [Caching & Performance Guide](./CACHING_GUIDE.md) - Reduce API pressure by 98%
 > - [Server-Side Search Examples](./SERVER_SEARCH_EXAMPLE.md)
 > - [Migration to v0.4.0](./MIGRATION_0.4.0.md)
