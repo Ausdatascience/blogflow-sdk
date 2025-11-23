@@ -64,8 +64,8 @@ export function BlogPostCard({
     }
   }
 
-  const displayDate = showDate && post.created_at
-    ? dateFormat(post.created_at, language)
+  const displayDate = showDate && (post.published_at || post.created_at)
+    ? dateFormat(post.published_at || post.created_at, language)
     : null
 
   return (

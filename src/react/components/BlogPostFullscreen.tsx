@@ -113,9 +113,9 @@ export function BlogPostFullscreen({
               {/* Bottom info */}
               <div className="blog-post-fullscreen-footer">
                 <div className="blog-post-fullscreen-meta">
-                  {post.created_at && (
+                  {(post.published_at || post.created_at) && (
                     <span className="blog-post-fullscreen-date">
-                      {formatDate(post.created_at)}
+                      {formatDate(post.published_at || post.created_at)}
                     </span>
                   )}
                 </div>

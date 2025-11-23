@@ -81,6 +81,7 @@ export interface V2PostListItem {
   category?: string | null
   featured_image_url?: string | null
   created_at: string
+  published_at?: string | null
   excerpt?: string | null
 }
 
@@ -96,6 +97,7 @@ export interface V2Post {
   seo_title?: string | null
   seo_description?: string | null
   created_at: string
+  published_at?: string | null
 }
 
 export interface V2ErrorResponse {

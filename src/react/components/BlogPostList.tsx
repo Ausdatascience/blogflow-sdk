@@ -195,9 +195,9 @@ export function BlogPostList({
                 {post.category && (
                   <span className="blog-post-list-item-category">{post.category}</span>
                 )}
-                {post.created_at && (
+                {(post.published_at || post.created_at) && (
                   <time className="blog-post-list-item-date">
-                    {new Date(post.created_at).toLocaleDateString(
+                    {new Date(post.published_at || post.created_at).toLocaleDateString(
                       language === 'zh' ? 'zh-CN' : 'en-US'
                     )}
                   </time>

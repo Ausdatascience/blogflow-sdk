@@ -67,7 +67,7 @@ export interface Theme {
   fontSizes: ThemeFontSizes
 }
 
-export type ThemeName = 'default' | 'blue' | 'minimal' | 'modern' | 'dark' | 'magic' | 'fantasy' | 'adventure' | 'tomorrow' | 'mainstreet' | 'none'
+export type ThemeName = 'default' | 'blue' | 'minimal' | 'modern' | 'dark' | 'magic' | 'fantasy' | 'adventure' | 'tomorrow' | 'mainstreet' | 'eyecare' | 'purewhite' | 'pureblack' | 'cyanblue' | 'none'
 
 export interface ThemeVars {
   primaryColor?: string

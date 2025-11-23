@@ -13,6 +13,10 @@ import { fantasyTheme } from './fantasy'
 import { adventureTheme } from './adventure'
 import { tomorrowTheme } from './tomorrow'
 import { mainstreetTheme } from './mainstreet'
+import { eyecareTheme } from './eyecare'
+import { purewhiteTheme } from './purewhite'
+import { pureblackTheme } from './pureblack'
+import { cyanblueTheme } from './cyanblue'
 import type { Theme, ThemeName } from '../types'
 
 export const themes: Record<Exclude<ThemeName, 'none'>, Theme> = {
@@ -26,6 +30,10 @@ export const themes: Record<Exclude<ThemeName, 'none'>, Theme> = {
   adventure: adventureTheme,
   tomorrow: tomorrowTheme,
   mainstreet: mainstreetTheme,
+  eyecare: eyecareTheme,
+  purewhite: purewhiteTheme,
+  pureblack: pureblackTheme,
+  cyanblue: cyanblueTheme,
 }
 
 export function getTheme(name: ThemeName): Theme | null {
@@ -44,5 +52,9 @@ export {
   adventureTheme,
   tomorrowTheme,
   mainstreetTheme,
+  eyecareTheme,
+  purewhiteTheme,
+  pureblackTheme,
+  cyanblueTheme,
 }
 

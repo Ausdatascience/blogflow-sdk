@@ -4,6 +4,7 @@
  */
 
 import { useState, useEffect } from 'react'
+import type React from 'react'
 import { V2PostListItem, SupportedLanguage } from '../../core'
 
 export interface BlogPostCarouselProps {
@@ -42,6 +43,7 @@ export function BlogPostCarousel({
   const [isPlaying, setIsPlaying] = useState(autoPlay)
   const [isDragging, setIsDragging] = useState(false)
   const [dragStart, setDragStart] = useState<{ x: number; y: number } | null>(null)
+  const [dragOffset, setDragOffset] = useState(0)
 
   useEffect(() => {
     if (!isPlaying || posts.length <= 1) return
@@ -80,28 +82,79 @@ export function BlogPostCarousel({
     onPostClick?.(slug)
   }
 
-  const handleMouseDown = (e: React.MouseEvent) => {
-    setDragStart({ x: e.clientX, y: e.clientY })
+  const handleStart = (clientX: number, clientY: number) => {
+    setDragStart({ x: clientX, y: clientY })
     setIsDragging(false)
+    setDragOffset(0)
+    setIsPlaying(false)
   }
 
-  const handleMouseMove = (e: React.MouseEvent) => {
+  const handleMove = (clientX: number, clientY: number) => {
     if (dragStart) {
-      const deltaX = Math.abs(e.clientX - dragStart.x)
-      const deltaY = Math.abs(e.clientY - dragStart.y)
-      // 如果移动距离超过 5px，认为是拖拽
-      if (deltaX > 5 || deltaY > 5) {
+      const deltaX = clientX - dragStart.x
+      const deltaY = Math.abs(clientY - dragStart.y)
+      
+      // 如果水平移动距离超过垂直移动距离，认为是水平拖拽
+      if (Math.abs(deltaX) > 10 && Math.abs(deltaX) > deltaY) {
         setIsDragging(true)
+        setDragOffset(deltaX)
       }
     }
   }
 
-  const handleMouseUp = () => {
+  const handleEnd = () => {
+    if (dragStart && isDragging) {
+      const deltaX = dragOffset
+      const threshold = 50 // 拖拽超过 50px 才切换
+      
+      if (Math.abs(deltaX) > threshold) {
+        if (deltaX > 0) {
+          // 向右拖拽，显示上一张
+          goToPrevious()
+        } else {
+          // 向左拖拽，显示下一张
+          goToNext()
+        }
+      }
+    }
+    
     setDragStart(null)
+    setDragOffset(0)
     // 延迟重置拖拽状态，确保点击事件不会触发
     setTimeout(() => {
       setIsDragging(false)
     }, 100)
+  }
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault()
+    handleStart(e.clientX, e.clientY)
+  }
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (dragStart) {
+      handleMove(e.clientX, e.clientY)
+    }
+  }
+
+  const handleMouseUp = () => {
+    handleEnd()
+  }
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    const touch = e.touches[0]
+    handleStart(touch.clientX, touch.clientY)
+  }
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (dragStart) {
+      const touch = e.touches[0]
+      handleMove(touch.clientX, touch.clientY)
+    }
+  }
+
+  const handleTouchEnd = () => {
+    handleEnd()
   }
 
   const formatDate = (dateString: string) => {
@@ -120,105 +173,169 @@ export function BlogPostCarousel({
     return null
   }
 
-  const currentPost = posts[currentIndex]
+  // 计算要显示的卡片索引（当前 + 前后各一张）
+  const getVisibleIndices = () => {
+    const indices: number[] = []
+    const prevIndex = (currentIndex - 1 + posts.length) % posts.length
+    const nextIndex = (currentIndex + 1) % posts.length
+    indices.push(prevIndex, currentIndex, nextIndex)
+    return indices
+  }
+
+  const visibleIndices = getVisibleIndices()
+
+  // 计算每张卡片的位置和样式
+  const getCardStyle = (index: number): React.CSSProperties => {
+    const position = visibleIndices.indexOf(index)
+    if (position === -1) {
+      return { display: 'none' }
+    }
+
+    // 中间是当前卡片，左边是上一张，右边是下一张
+    const baseOffset = (position - 1) * 100 // -100%, 0%, 100%
+    
+    // 计算拖动偏移（使用百分比，基于容器宽度）
+    let dragOffsetPercent = 0
+    if (isDragging && typeof window !== 'undefined') {
+      const containerWidth = window.innerWidth
+      dragOffsetPercent = (dragOffset / containerWidth) * 100
+    }
+    
+    const translateX = baseOffset + dragOffsetPercent
+
+    return {
+      transform: `translateX(${translateX}%)`,
+      transition: isDragging ? 'none' : 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+      opacity: position === 1 ? 1 : 0.3, // 当前卡片完全不透明，其他半透明
+      zIndex: position === 1 ? 10 : position === 0 ? 9 : 8,
+      pointerEvents: position === 1 ? 'auto' : 'none',
+    }
+  }
 
   return (
-    <div className={`blog-post-list blog-post-list-carousel ${className}`}>
+    <div 
+      className={`blog-post-list blog-post-list-carousel ${className}`}
+      onMouseDown={handleMouseDown}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={handleMouseUp}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      style={{
+        cursor: isDragging ? 'grabbing' : 'grab',
+        position: 'relative',
+        overflow: 'hidden',
+      }}
+    >
       {/* Main carousel */}
-      <div className="blog-post-carousel-main">
-        <article
-          className={`blog-post-carousel-item ${itemClassName}`}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseUp}
-        >
-          {/* Background image */}
-          {currentPost.featured_image_url && (
-            <div className="blog-post-carousel-image">
-              <img
-                src={currentPost.featured_image_url}
-                alt={currentPost.title}
-                className="blog-post-carousel-image-img"
-                loading={currentIndex < 3 ? 'eager' : 'lazy'}
-              />
-            </div>
-          )}
+      <div className="blog-post-carousel-main" style={{ position: 'relative', width: '100%', height: '500px' }}>
+        {visibleIndices.map((postIndex, arrayIndex) => {
+          const post = posts[postIndex]
+          const cardStyle = getCardStyle(postIndex)
+          if (cardStyle.display === 'none') return null
 
-          {/* Overlay */}
-          <div className="blog-post-carousel-overlay"></div>
-
-          {/* Content */}
-          <div className="blog-post-carousel-content">
-            <div className="blog-post-carousel-content-inner">
-              {/* Tags */}
-              {currentPost.category && (
-                <div className="blog-post-carousel-tags">
-                  <span className="blog-post-carousel-tag">{currentPost.category}</span>
+          return (
+            <article
+              key={`${post.id}-${postIndex}`}
+              className={`blog-post-carousel-item ${itemClassName}`}
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                ...cardStyle,
+              }}
+            >
+              {/* Background image */}
+              {post.featured_image_url && (
+                <div className="blog-post-carousel-image">
+                  <img
+                    src={post.featured_image_url}
+                    alt={post.title}
+                    className="blog-post-carousel-image-img"
+                    loading={arrayIndex === 1 ? 'eager' : 'lazy'}
+                  />
                 </div>
               )}
 
-              {/* Title */}
-              <h2 className="blog-post-carousel-title">{currentPost.title}</h2>
+              {/* Overlay */}
+              <div className="blog-post-carousel-overlay"></div>
 
-              {/* Excerpt */}
-              {currentPost.excerpt && (
-                <p className="blog-post-carousel-excerpt">{currentPost.excerpt}</p>
-              )}
-
-              {/* Footer */}
-              <div className="blog-post-carousel-footer">
-                <div className="blog-post-carousel-meta">
-                  {currentPost.created_at && (
-                    <span className="blog-post-carousel-date">
-                      {formatDate(currentPost.created_at)}
-                    </span>
+              {/* Content */}
+              <div className="blog-post-carousel-content">
+                <div className="blog-post-carousel-content-inner">
+                  {/* Tags */}
+                  {post.category && (
+                    <div className="blog-post-carousel-tags">
+                      <span className="blog-post-carousel-tag">{post.category}</span>
+                    </div>
                   )}
+
+                  {/* Title */}
+                  <h2 className="blog-post-carousel-title">{post.title}</h2>
+
+                  {/* Excerpt */}
+                  {post.excerpt && (
+                    <p className="blog-post-carousel-excerpt">{post.excerpt}</p>
+                  )}
+
+                  {/* Footer */}
+                  <div className="blog-post-carousel-footer">
+                    <div className="blog-post-carousel-meta">
+                      {(post.published_at || post.created_at) && (
+                        <span className="blog-post-carousel-date">
+                          {formatDate(post.published_at || post.created_at)}
+                        </span>
+                      )}
+                    </div>
+
+                    <button
+                      className="blog-post-carousel-cta"
+                      onClick={(e) => handleClick(post.slug, e)}
+                      onKeyDown={(e) => {
+                        if (onPostClick && (e.key === 'Enter' || e.key === ' ')) {
+                          e.preventDefault()
+                          handleClick(post.slug)
+                        }
+                      }}
+                    >
+                      {language === 'zh' ? '阅读更多' : 'Read More'}
+                    </button>
+                  </div>
                 </div>
-
-                <button
-                  className="blog-post-carousel-cta"
-                  onClick={(e) => handleClick(currentPost.slug, e)}
-                  onKeyDown={(e) => {
-                    if (onPostClick && (e.key === 'Enter' || e.key === ' ')) {
-                      e.preventDefault()
-                      handleClick(currentPost.slug)
-                    }
-                  }}
-                >
-                  {language === 'zh' ? '阅读更多' : 'Read More'}
-                </button>
               </div>
-            </div>
-          </div>
+            </article>
+          )
+        })}
 
-          {/* Page indicator */}
-          <div className="blog-post-carousel-indicator">
-            {currentIndex + 1} / {posts.length}
-          </div>
+        {/* Page indicator */}
+        <div className="blog-post-carousel-indicator">
+          {currentIndex + 1} / {posts.length}
+        </div>
 
-          {/* Navigation buttons */}
-          <button
-            className="blog-post-carousel-nav blog-post-carousel-nav-prev"
-            onClick={(e) => {
-              e.stopPropagation()
-              goToPrevious()
-            }}
-            aria-label={language === 'zh' ? '上一张' : 'Previous'}
-          >
-            ←
-          </button>
-          <button
-            className="blog-post-carousel-nav blog-post-carousel-nav-next"
-            onClick={(e) => {
-              e.stopPropagation()
-              goToNext()
-            }}
-            aria-label={language === 'zh' ? '下一张' : 'Next'}
-          >
-            →
-          </button>
-        </article>
+        {/* Navigation buttons */}
+        <button
+          className="blog-post-carousel-nav blog-post-carousel-nav-prev"
+          onClick={(e) => {
+            e.stopPropagation()
+            goToPrevious()
+          }}
+          aria-label={language === 'zh' ? '上一张' : 'Previous'}
+        >
+          ←
+        </button>
+        <button
+          className="blog-post-carousel-nav blog-post-carousel-nav-next"
+          onClick={(e) => {
+            e.stopPropagation()
+            goToNext()
+          }}
+          aria-label={language === 'zh' ? '下一张' : 'Next'}
+        >
+          →
+        </button>
       </div>
 
       {/* Pagination dots */}

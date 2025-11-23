@@ -5,14 +5,14 @@
 
 TypeScript SDK for BlogFlow API Server v2 - A lightweight, high-performance client for fetching blog posts with **server-side search**, **Next.js ISR caching**, and **multilingual support**.
 
-## ✨ Key Features (v0.5.0)
+## ✨ Key Features (v0.6.2)
 
 - 🚀 **Server-Side Search** - Search entire database, not just loaded posts (10-100x faster)
 - ⚡ **Next.js ISR Caching** - Reduce API requests by 98%+ with Incremental Static Regeneration
 - 🎯 **React Hooks** - `useBlogPosts`, `useBlogPost`, `useBlogSearch` with auto-debouncing
 - 🌍 **Multilingual** - Support for 7 languages (en, zh, es, fr, de, ja, ko)
 - 📦 **TypeScript First** - Full type safety with comprehensive type definitions
-- 🎨 **Built-in Themes** - **NEW** - 4 beautiful themes with zero-config styling
+- 🎨 **Built-in Themes** - **NEW** - 14 beautiful themes with zero-config styling
 - 🎭 **Auto-Inject Styles** - **NEW** - Automatic CSS injection, no manual imports needed
 - 🔧 **Fully Customizable** - Pre-built React components with `className` support
 - 🔒 **SSR Ready** - Works in Node.js, Next.js server components, and browsers
@@ -29,7 +29,7 @@ pnpm add @blogflow/sdk
 
 ### 🎨 Styling (Zero-Config)
 
-**NEW in v0.5.0:** BlogFlow SDK now includes **automatic style injection** with 4 built-in themes!
+**NEW in v0.6.2:** BlogFlow SDK now includes **automatic style injection** with 14 built-in themes!
 
 **Zero-Config Usage (Default Theme):**
 ```tsx
