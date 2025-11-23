@@ -18,12 +18,24 @@ export interface BlogPostCardProps {
 
 /**
  * Default date formatter
+ * Uses UTC date methods to avoid timezone conversion issues
  */
 function formatDate(dateString: string, lang?: SupportedLanguage): string {
   try {
     const date = new Date(dateString)
     if (Number.isNaN(date.getTime())) return ''
-    return date.toLocaleDateString(
+    
+    // Use UTC methods to avoid timezone conversion
+    // This ensures the date displayed matches the date in the database
+    const year = date.getUTCFullYear()
+    const month = date.getUTCMonth()
+    const day = date.getUTCDate()
+    
+    // Create a date object in local timezone with the same date values
+    // This prevents timezone conversion from shifting the date
+    const localDate = new Date(year, month, day)
+    
+    return localDate.toLocaleDateString(
       lang === 'zh' ? 'zh-CN' : 'en-US',
       {
         year: 'numeric',

@@ -44,7 +44,12 @@ export function BlogPostFullscreen({
     try {
       const date = new Date(dateString)
       if (Number.isNaN(date.getTime())) return ''
-      return date.toLocaleDateString(
+      // Use UTC methods to avoid timezone conversion issues
+      const year = date.getUTCFullYear()
+      const month = date.getUTCMonth()
+      const day = date.getUTCDate()
+      const localDate = new Date(year, month, day)
+      return localDate.toLocaleDateString(
         language === 'zh' ? 'zh-CN' : 'en-US',
         {
           year: 'numeric',

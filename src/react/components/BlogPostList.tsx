@@ -195,13 +195,21 @@ export function BlogPostList({
                 {post.category && (
                   <span className="blog-post-list-item-category">{post.category}</span>
                 )}
-                {(post.published_at || post.created_at) && (
-                  <time className="blog-post-list-item-date">
-                    {new Date(post.published_at || post.created_at).toLocaleDateString(
-                      language === 'zh' ? 'zh-CN' : 'en-US'
-                    )}
-                  </time>
-                )}
+                {(post.published_at || post.created_at) && (() => {
+                  const date = new Date(post.published_at || post.created_at)
+                  // Use UTC methods to avoid timezone conversion issues
+                  const year = date.getUTCFullYear()
+                  const month = date.getUTCMonth()
+                  const day = date.getUTCDate()
+                  const localDate = new Date(year, month, day)
+                  return (
+                    <time className="blog-post-list-item-date">
+                      {localDate.toLocaleDateString(
+                        language === 'zh' ? 'zh-CN' : 'en-US'
+                      )}
+                    </time>
+                  )
+                })()}
               </div>
             </div>
           </article>

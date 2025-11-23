@@ -5,6 +5,7 @@
 
 export interface ThemeColors {
   primary: string
+  primaryText?: string // Text color on primary background (defaults to #ffffff)
   background: string
   backgroundHover: string
   text: string

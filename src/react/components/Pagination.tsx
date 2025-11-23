@@ -236,13 +236,17 @@ export function Pagination({
 
   // Simple mode: only show page numbers
   if (variant === 'simple') {
+    // Generate unique keys for ellipsis by tracking their position
+    let ellipsisCounter = 0
     return (
       <div className={`blog-pagination blog-pagination-variant-simple ${className}`}>
         <div className="blog-pagination-controls">
           {visiblePages.map((page, index) => {
             if (page === 'ellipsis') {
+              // Use a unique counter to ensure each ellipsis has a unique key
+              const ellipsisKey = `ellipsis-${ellipsisCounter++}`
               return (
-                <span key={`ellipsis-${index}`} className="blog-pagination-ellipsis">
+                <span key={ellipsisKey} className="blog-pagination-ellipsis">
                   ...
                 </span>
               )
@@ -250,7 +254,7 @@ export function Pagination({
 
             return (
               <button
-                key={page}
+                key={`page-${page}`}
                 type="button"
                 onClick={() => onPageChange(page)}
                 disabled={loading}
@@ -347,31 +351,37 @@ export function Pagination({
 
         {/* Page Numbers */}
         <div className="blog-pagination-pages">
-          {visiblePages.map((page, index) => {
-            if (page === 'ellipsis') {
-              return (
-                <span key={`ellipsis-${index}`} className="blog-pagination-ellipsis">
-                  ...
-                </span>
-              )
-            }
+          {(() => {
+            // Generate unique keys for ellipsis by tracking their position
+            let ellipsisCounter = 0
+            return visiblePages.map((page, index) => {
+              if (page === 'ellipsis') {
+                // Use a unique counter to ensure each ellipsis has a unique key
+                const ellipsisKey = `ellipsis-${ellipsisCounter++}`
+                return (
+                  <span key={ellipsisKey} className="blog-pagination-ellipsis">
+                    ...
+                  </span>
+                )
+              }
 
-            return (
-              <button
-                key={page}
-                type="button"
-                onClick={() => onPageChange(page)}
-                disabled={loading}
-                className={`blog-pagination-button blog-pagination-button-page ${
-                  currentPage === page ? 'blog-pagination-button-active' : ''
-                }`}
-                aria-label={`${t.page} ${page}`}
-                aria-current={currentPage === page ? 'page' : undefined}
-              >
-                {page}
-              </button>
-            )
-          })}
+              return (
+                <button
+                  key={`page-${page}`}
+                  type="button"
+                  onClick={() => onPageChange(page)}
+                  disabled={loading}
+                  className={`blog-pagination-button blog-pagination-button-page ${
+                    currentPage === page ? 'blog-pagination-button-active' : ''
+                  }`}
+                  aria-label={`${t.page} ${page}`}
+                  aria-current={currentPage === page ? 'page' : undefined}
+                >
+                  {page}
+                </button>
+              )
+            })
+          })()}
         </div>
 
         <button

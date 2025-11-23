@@ -11,6 +11,7 @@ export const purewhiteTheme: Theme = {
   
   colors: {
     primary: '#000000', // 纯黑作为主色
+    primaryText: '#ffffff', // 主色背景上的文字颜色（白色）
     background: '#ffffff', // 纯白背景
     backgroundHover: '#f5f5f5', // 极浅灰 hover
     text: '#000000', // 纯黑文字

@@ -9,6 +9,7 @@ export function generateCSS(theme: Theme, customVars?: ThemeVars, stylesConfig?:
   // Apply custom variable overrides
   const colors = {
     primary: customVars?.primaryColor || theme.colors.primary,
+    primaryText: theme.colors.primaryText || '#ffffff', // Default to white text on primary background
     background: customVars?.backgroundColor || theme.colors.background,
     text: customVars?.textColor || theme.colors.text,
     border: customVars?.borderColor || theme.colors.border,
@@ -44,6 +45,7 @@ export function generateCSS(theme: Theme, customVars?: ThemeVars, stylesConfig?:
   ${useWebsiteColors 
     ? `/* Default theme: Attempts to use website's global colors with fallbacks */
   --blogflow-primary: var(--primary, var(--color-primary, var(--accent, ${colors.primary})));
+  --blogflow-primary-text: ${colors.primaryText};
   --blogflow-bg: var(--background, var(--color-background, var(--bg, ${colors.background})));
   --blogflow-bg-hover: var(--background-hover, var(--color-background-hover, var(--bg-hover, ${theme.colors.backgroundHover})));
   --blogflow-text: var(--foreground, var(--color-foreground, var(--text, var(--color-text, ${colors.text}))));
@@ -54,6 +56,7 @@ export function generateCSS(theme: Theme, customVars?: ThemeVars, stylesConfig?:
   --blogflow-category-text: var(--category-text, var(--color-category-text, ${theme.colors.categoryText}));
   --blogflow-shadow: var(--shadow, var(--color-shadow, ${theme.colors.shadow}));`
     : `--blogflow-primary: ${colors.primary};
+  --blogflow-primary-text: ${colors.primaryText};
   --blogflow-bg: ${colors.background};
   --blogflow-bg-hover: ${theme.colors.backgroundHover};
   --blogflow-text: ${colors.text};
@@ -1176,7 +1179,7 @@ export function generateCSS(theme: Theme, customVars?: ThemeVars, stylesConfig?:
 
 .blog-search-language-toggle button.active {
   background: var(--blogflow-primary);
-  color: #ffffff;
+  color: var(--blogflow-primary-text);
   font-weight: 500;
 }
 
@@ -1290,7 +1293,7 @@ export function generateCSS(theme: Theme, customVars?: ThemeVars, stylesConfig?:
 
 .blog-pagination-button-active {
   background: var(--blogflow-primary);
-  color: #ffffff;
+  color: var(--blogflow-primary-text);
   border-color: var(--blogflow-primary);
   font-weight: 600;
 }
@@ -1298,7 +1301,7 @@ export function generateCSS(theme: Theme, customVars?: ThemeVars, stylesConfig?:
 .blog-pagination-button-active:hover:not(:disabled) {
   background: var(--blogflow-border-hover);
   border-color: var(--blogflow-border-hover);
-  color: #ffffff;
+  color: var(--blogflow-primary-text);
   transform: translateY(-1px);
   box-shadow: var(--blogflow-shadow-md);
 }
