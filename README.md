@@ -2,20 +2,59 @@
 
 [![npm version](https://img.shields.io/npm/v/@blogflow/sdk.svg)](https://www.npmjs.com/package/@blogflow/sdk)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9+-blue.svg)](https://www.typescriptlang.org/)
+[![SSR Supported](https://img.shields.io/badge/SSR-Supported-green.svg)](https://nextjs.org/)
 
-TypeScript SDK for BlogFlow API Server v2 - A lightweight, high-performance client for fetching blog posts with **server-side search**, **Next.js ISR caching**, and **multilingual support**.
+**The AI Content Engine for Next.js & React** - A lightweight, high-performance TypeScript SDK for BlogFlow API Server v2 with **server-side search**, **Next.js ISR caching**, and **multilingual support**.
 
-## ✨ Key Features (v0.6.2)
+*Built by [Ausdata Science](https://ausdata.ai) | Powered by [Ausdata Matrix](https://www.ausdata.app) & [Ausdata Lab](https://www.ausdata.org)*
 
-- 🚀 **Server-Side Search** - Search entire database, not just loaded posts (10-100x faster)
-- ⚡ **Next.js ISR Caching** - Reduce API requests by 98%+ with Incremental Static Regeneration
+## 🚀 v1.0.0
+
+- **hybrid architecture** that combines the best of server-side and client-side rendering:
+
+- **🔀 Hybrid Architecture** - Server-side rendering (SSR) for SEO and performance, client-side for rich interactions
+- **⚡ Smart Caching** - Built-in support for Next.js ISR (Incremental Static Regeneration) to significantly reduce API calls
+- **🔍 Server-Side Search** - High-performance search across entire datasets with database indexes
+- **🏗️ Production-Ready** - Powered by [Ausdata Matrix](https://www.ausdata.app) infrastructure for enterprise-grade reliability
+
+## ✨ Features
+
+- 🚀 **Server-Side Search** - Search entire database with database indexes for faster and more accurate results
+- ⚡ **Next.js ISR Caching** - Reduce API requests significantly with Incremental Static Regeneration
 - 🎯 **React Hooks** - `useBlogPosts`, `useBlogPost`, `useBlogSearch` with auto-debouncing
-- 🌍 **Multilingual** - Support for 7 languages (en, zh, es, fr, de, ja, ko)
+- 🌍 **Multilingual** - Multiple languages support (en, zh, es, fr, de, ja, ko)
 - 📦 **TypeScript First** - Full type safety with comprehensive type definitions
-- 🎨 **Built-in Themes** - **NEW** - 14 beautiful themes with zero-config styling
-- 🎭 **Auto-Inject Styles** - **NEW** - Automatic CSS injection, no manual imports needed
+- 🎨 **Built-in Themes** - Multiple beautiful themes with zero-config styling
+- 🎭 **Auto-Inject Styles** - Automatic CSS injection, no manual imports needed
 - 🔧 **Fully Customizable** - Pre-built React components with `className` support
 - 🔒 **SSR Ready** - Works in Node.js, Next.js server components, and browsers
+- 📄 **Pagination Support** - Built-in pagination with `getPaginatedPosts` and pagination components
+
+## System Requirements
+
+### Runtime Requirements
+
+- **Node.js**: >= 18.0.0 (for server-side usage)
+- **React**: >= 16.8.0 (for React hooks and components)
+- **React DOM**: >= 16.8.0 (for React components)
+
+### Browser Compatibility
+
+- **Modern Browsers**: Chrome 90+, Firefox 88+, Safari 14+, Edge 90+
+- **ES Modules**: Required for ESM builds
+- **Fetch API**: Required (native in Node.js 18+ and modern browsers)
+
+### Framework Support
+
+- **Next.js**: >= 13.0.0 (App Router and Pages Router)
+- **Vite**: >= 4.0.0
+- **Create React App**: >= 5.0.0
+- **Remix**: >= 1.0.0
+
+### TypeScript
+
+- **TypeScript**: >= 4.5.0 (optional, but recommended for type safety)
 
 ## Installation
 
@@ -27,11 +66,161 @@ yarn add @blogflow/sdk
 pnpm add @blogflow/sdk
 ```
 
-### 🎨 Styling (Zero-Config)
+## Quick Start
 
-**NEW in v0.6.2:** BlogFlow SDK now includes **automatic style injection** with 14 built-in themes!
+### Hybrid Mode: Server Component + Client Component (Recommended)
 
-**Zero-Config Usage (Default Theme):**
+The recommended pattern for v1.0.0 is to fetch data in Server Components and pass it to Client Components for rendering:
+
+```typescript
+// app/blog/page.tsx (Server Component)
+import { createClient } from '@blogflow/sdk/core'
+import { BlogPostList } from '@blogflow/sdk/react'
+
+export default async function BlogPage() {
+  const client = createClient({ 
+    apiKey: process.env.BLOGFLOW_API_KEY! 
+  })
+  
+  // Fetch data on server with ISR caching
+  const posts = await client.getPosts({ 
+    limit: 20,
+    next: { revalidate: 3600 } // Cache for 1 hour
+  })
+  
+  // Pass data to client component
+  return <BlogPostList posts={posts} />
+}
+```
+
+### Core Client (Node.js / Next.js Server Components)
+
+For server-side only usage:
+
+```typescript
+import { BlogFlow } from '@blogflow/sdk/core'
+
+// Create client
+const client = new BlogFlow({
+  apiKey: process.env.BLOGFLOW_API_KEY!,
+  defaultLanguage: 'en'
+})
+
+// Get posts list
+const posts = await client.getPosts({
+  lang: 'en',
+  limit: 20,
+  offset: 0
+})
+
+// Get paginated posts with metadata
+const paginated = await client.getPaginatedPosts({
+  lang: 'en',
+  page: 1,
+  pageSize: 20
+})
+
+// Get single post
+const post = await client.getPost('my-article-slug', {
+  lang: 'en'
+})
+```
+
+### React Hooks (Client Components)
+
+```typescript
+'use client'
+import { BlogFlowProvider, useBlogPosts, useBlogPost, useBlogSearch } from '@blogflow/sdk/react'
+
+function App() {
+  return (
+    <BlogFlowProvider config={{ apiKey: process.env.NEXT_PUBLIC_BLOGFLOW_API_KEY! }}>
+      <PostsList />
+      <PostDetail slug="my-article" />
+      <SearchPage />
+    </BlogFlowProvider>
+  )
+}
+
+function PostsList() {
+  const { posts, loading, error, totalPages, currentPage, fetchPage } = useBlogPosts({
+    lang: 'en',
+    pageSize: 20,
+    autoFetch: true
+  })
+
+  if (loading) return <p>Loading...</p>
+  if (error) return <p>Error: {error}</p>
+
+  return (
+    <div>
+      {posts.map(post => (
+        <article key={post.id}>
+          <h2>{post.title}</h2>
+          <p>{post.excerpt}</p>
+        </article>
+      ))}
+      <div>
+        {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+          <button key={page} onClick={() => fetchPage(page)}>
+            {page}
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function PostDetail({ slug }: { slug: string }) {
+  const { post, loading, error } = useBlogPost(slug, {
+    lang: 'en'
+  })
+
+  if (loading) return <p>Loading...</p>
+  if (error) return <p>Error: {error}</p>
+  if (!post) return <p>Post not found</p>
+
+  return (
+    <article>
+      <h1>{post.title}</h1>
+      <div dangerouslySetInnerHTML={{ __html: post.content }} />
+    </article>
+  )
+}
+
+function SearchPage() {
+  const [searchTerm, setSearchTerm] = useState('')
+
+  // Server-side search with auto-debouncing
+  const { results, loading, totalCount } = useBlogSearch({
+    searchTerm,
+    debounceMs: 300,
+    lang: 'en'
+  })
+
+  return (
+    <div>
+      <input
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        placeholder="Search posts..."
+      />
+      {loading && <p>Searching...</p>}
+      <p>Found {totalCount} results</p>
+      {results.map(post => (
+        <div key={post.id}>{post.title}</div>
+      ))}
+    </div>
+  )
+}
+```
+
+## Styling
+
+### Zero-Config Usage (Default Theme)
+
+BlogFlow SDK includes automatic style injection with 15 built-in themes.
+
 ```tsx
 import { BlogFlowProvider, BlogPostList } from '@blogflow/sdk/react'
 
@@ -40,17 +229,19 @@ import { BlogFlowProvider, BlogPostList } from '@blogflow/sdk/react'
 </BlogFlowProvider>
 ```
 
-**Choose a Theme:**
+### Choose a Theme
+
 ```tsx
 <BlogFlowProvider config={{ 
   apiKey: 'your-key',
-  styles: { theme: 'dark' }  // 'default' | 'minimal' | 'modern' | 'dark'
+  styles: { theme: 'violet' }  // 'default' | 'minimal' | 'modern' | 'dark' | 'magic' | 'violet' | etc.
 }}>
   <BlogPostList posts={posts} />
 </BlogFlowProvider>
 ```
 
-**Use External CSS (Better Performance):**
+### Use External CSS (Better Performance)
+
 ```tsx
 import '@blogflow/sdk/styles/default.css'  // Import once
 
@@ -62,7 +253,8 @@ import '@blogflow/sdk/styles/default.css'  // Import once
 </BlogFlowProvider>
 ```
 
-**Custom Styling:**
+### Custom Styling
+
 ```tsx
 <BlogFlowProvider config={{ 
   apiKey: 'your-key',
@@ -78,232 +270,70 @@ import '@blogflow/sdk/styles/default.css'  // Import once
 </BlogFlowProvider>
 ```
 
-📖 **[Complete Styling Guide](./STYLING_GUIDE.md)** - Learn about all themes, customization options, and best practices.
-
-> 📖 **Documentation**:
-> - [Complete Usage Guide](./USAGE.md)
-> - [Styling Guide](./STYLING_GUIDE.md) - **NEW** - Themes & customization
-> - [Caching & Performance Guide](./CACHING_GUIDE.md) - Reduce API pressure by 98%
-> - [Server-Side Search Examples](./SERVER_SEARCH_EXAMPLE.md)
-> - [Migration to v0.4.0](./MIGRATION_0.4.0.md)
-
-## Getting Your API Key
-
-Before using the SDK, you need to obtain an API key from your BlogFlow API Server. Contact your administrator or check your BlogFlow dashboard to get your API key.
-
 ## Configuration
 
 ### Setting API Key
 
-The API key can be set in several ways depending on your use case:
-
-#### 1. Environment Variables (Recommended for Production)
+#### Environment Variables (Recommended for Production)
 
 **For Server-Side (Next.js, Node.js):**
 
-Create a `.env.local` file in your project root:
+Create a `.env.local` file:
 
 ```bash
-# .env.local
 BLOGFLOW_API_KEY=your-api-key-here
 BLOGFLOW_API_URL=https://blogflow-api-server.vercel.app/api/v2  # optional
 ```
 
-Then use it in your code:
-
 ```typescript
-import { BlogFlow } from '@blogflow/sdk'
+import { BlogFlow } from '@blogflow/sdk/core'
 
 const client = new BlogFlow({
   apiKey: process.env.BLOGFLOW_API_KEY!,
-  baseUrl: process.env.BLOGFLOW_API_URL, // optional
-  defaultLanguage: 'zh'
+  baseUrl: process.env.BLOGFLOW_API_URL,
+  defaultLanguage: 'en'
 })
 ```
 
-**For Client-Side (React, Vue, etc.):**
-
-Create a `.env.local` file with `NEXT_PUBLIC_` prefix (for Next.js):
+**For Client-Side (React):**
 
 ```bash
-# .env.local
 NEXT_PUBLIC_BLOGFLOW_API_KEY=your-api-key-here
 ```
 
 ```typescript
-import { BlogFlow } from '@blogflow/sdk'
+import { BlogFlowProvider } from '@blogflow/sdk/react'
 
-const client = new BlogFlow({
-  apiKey: process.env.NEXT_PUBLIC_BLOGFLOW_API_KEY!,
-  defaultLanguage: 'zh'
-})
+<BlogFlowProvider config={{ 
+  apiKey: process.env.NEXT_PUBLIC_BLOGFLOW_API_KEY! 
+}}>
+  {/* Your components */}
+</BlogFlowProvider>
 ```
 
 > ⚠️ **Security Note:** Never expose your API key in client-side code if it's sensitive. Consider using a proxy API route in Next.js to keep the key secure.
 
-#### 2. Direct Configuration (For Testing/Development)
+#### Direct Configuration
 
 ```typescript
-import { BlogFlow, createClient } from '@blogflow/sdk'
+import { BlogFlow, createClient } from '@blogflow/sdk/core'
 
-// Direct configuration
 const client = new BlogFlow({
   apiKey: 'your-api-key-here',
-  baseUrl: 'https://blogflow-api-server.vercel.app/api/v2', // optional
-  defaultLanguage: 'zh' // optional
+  baseUrl: 'https://blogflow-api-server.vercel.app/api/v2',
+  defaultLanguage: 'en'
 })
 
 // Or use factory function
 const client = createClient({
   apiKey: 'your-api-key-here',
-  defaultLanguage: 'zh'
+  defaultLanguage: 'en'
 })
 ```
 
-#### 3. Configuration File (For Complex Setups)
+## Next.js ISR Caching
 
-Create a config file:
-
-```typescript
-// config/blogflow.ts
-import { BlogFlowConfig } from '@blogflow/sdk'
-
-export const blogflowConfig: BlogFlowConfig = {
-  apiKey: process.env.BLOGFLOW_API_KEY!,
-  baseUrl: process.env.BLOGFLOW_API_URL || 'https://blogflow-api-server.vercel.app/api/v2',
-  defaultLanguage: 'zh'
-}
-```
-
-Then import and use:
-
-```typescript
-import { BlogFlow } from '@blogflow/sdk'
-import { blogflowConfig } from './config/blogflow'
-
-const client = new BlogFlow(blogflowConfig)
-```
-
-## Quick Start
-
-### Core Client (Node.js / Next.js Server Components)
-
-```typescript
-import { BlogFlow } from '@blogflow/sdk/core'
-
-// Create client
-const client = new BlogFlow({
-  apiKey: process.env.BLOGFLOW_API_KEY!,
-  defaultLanguage: 'zh'
-})
-
-// Get posts list
-const posts = await client.getPosts({
-  lang: 'zh',
-  limit: 20,
-  offset: 0
-})
-
-// Get single post
-const post = await client.getPost('my-article-slug', {
-  lang: 'zh'
-})
-```
-
-### React Hooks (Client Components)
-
-```typescript
-'use client'
-import { BlogFlowProvider, useBlogPosts, useBlogSearch } from '@blogflow/sdk/react'
-
-function App() {
-  return (
-    <BlogFlowProvider config={{ apiKey: process.env.NEXT_PUBLIC_BLOGFLOW_API_KEY! }}>
-      <PostsList />
-      <SearchPage />
-    </BlogFlowProvider>
-  )
-}
-
-function PostsList() {
-  const { posts, loading, error } = useBlogPosts({
-    limit: 10,
-    autoFetch: true
-  })
-
-  if (loading) return <p>Loading...</p>
-  if (error) return <p>Error: {error}</p>
-
-  return (
-    <div>
-      {posts.map(post => (
-        <article key={post.id}>
-          <h2>{post.title}</h2>
-          <p>{post.excerpt}</p>
-        </article>
-      ))}
-    </div>
-  )
-}
-
-function SearchPage() {
-  const [searchTerm, setSearchTerm] = useState('')
-
-  // Server-side search with auto-debouncing (v0.4.0+)
-  const { results, loading } = useBlogSearch({
-    searchTerm,
-    debounceMs: 300
-  })
-
-  return (
-    <div>
-      <input
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        placeholder="Search posts..."
-      />
-      {loading && <p>Searching...</p>}
-      {results.map(post => (
-        <div key={post.id}>{post.title}</div>
-      ))}
-    </div>
-  )
-}
-```
-
-## 🚀 New in v0.4.1: Performance Features
-
-### Server-Side Search (10-100x Faster)
-
-**Problem:** Client-side filtering only searches loaded posts, missing results on other pages.
-
-**Solution:** Server-side search queries entire database with database indexes.
-
-```typescript
-// ❌ Old way (v0.3.x) - Only searches current page
-const { posts } = useBlogPosts({ limit: 10 })  // Only 10 posts loaded
-const filtered = posts.filter(p => p.title.includes('react'))  // Misses page 2+
-
-// ✅ New way (v0.4.0+) - Searches entire database
-const { results, loading } = useBlogSearch({
-  searchTerm: 'react'  // Searches all posts in database
-})
-```
-
-**Performance:**
-- 90% less data transfer
-- 10-100x faster search with SQL indexes
-- No browser lag with 1000+ posts
-
-[📖 Full Server Search Guide](./SERVER_SEARCH_EXAMPLE.md)
-
----
-
-### Next.js ISR Caching (98% API Reduction)
-
-**Problem:** 1000 concurrent users = 1000 API requests → API overload
-
-**Solution:** Next.js Incremental Static Regeneration caches responses.
+Significantly reduce API requests with Incremental Static Regeneration.
 
 ```typescript
 import { BlogFlow } from '@blogflow/sdk/core'
@@ -327,11 +357,10 @@ const post = await client.getPost('my-slug', {
 
 **Performance Impact:**
 
-| Traffic | Without Cache | With ISR (60s) | API Savings |
-|---------|---------------|----------------|-------------|
-| 1,000 users/min | 1,000 API calls | ~17 API calls | **98.3%** |
-| 10,000 users/min | 10,000 API calls | ~167 API calls | **98.3%** |
-| 100,000 users/min | 100,000 API calls | ~1,667 API calls | **98.3%** |
+| Traffic | Without Cache | With ISR (60s) |
+|---------|---------------|----------------|
+| 1,000 users/min | 1,000 API calls | ~17 API calls |
+| 10,000 users/min | 10,000 API calls | ~167 API calls |
 
 **On-Demand Revalidation:**
 
@@ -346,10 +375,6 @@ export async function POST(request: Request) {
 }
 ```
 
-[📖 Full Caching Guide](./CACHING_GUIDE.md)
-
----
-
 ## API Reference
 
 ### Configuration
@@ -357,128 +382,176 @@ export async function POST(request: Request) {
 ```typescript
 interface BlogFlowConfig {
   apiKey: string                    // Required: Your API key
-  baseUrl?: string                   // Optional: API base URL (default: https://blogflow-api-server.vercel.app/api/v2)
-  defaultLanguage?: SupportedLanguage // Optional: Default language for requests
+  baseUrl?: string                  // Optional: API base URL
+  defaultLanguage?: SupportedLanguage // Optional: Default language
 }
 ```
 
-### Methods
+### Core Client Methods
 
 #### `getPosts(params?)`
 
-Get a list of posts with minimal fields (optimized for performance).
+Get a list of posts with minimal fields.
 
-**Parameters:**
 ```typescript
-interface V2GetPostsParams {
-  lang?: SupportedLanguage           // Language code (en, zh, es, fr, de, ja, ko)
-  limit?: number                      // Number of posts (default: 20, max: 100)
-  offset?: number                     // Pagination offset (default: 0)
-  sort?: 'id' | 'created_at' | 'updated_at'  // Sort field (default: 'id')
-  order?: 'asc' | 'desc'             // Sort order (default: 'desc')
-  search?: string                     // 🆕 Search keyword (v0.3.0+)
-  searchFields?: SearchField[]        // 🆕 Fields to search (v0.3.0+)
-  next?: NextFetchOptions             // 🆕 Next.js ISR cache (v0.4.1+)
-  cache?: RequestCache                // 🆕 Standard fetch cache (v0.4.1+)
-}
-
-type SearchField = 'title' | 'excerpt' | 'category' | 'slug'
-
-interface NextFetchOptions {
-  revalidate?: number | false         // ISR revalidation in seconds
-  tags?: string[]                     // Tags for on-demand revalidation
-}
-```
-
-**Returns:** `Promise<V2PostListItem[]>`
-
-**Examples:**
-```typescript
-// Basic usage
 const posts = await client.getPosts({
-  lang: 'zh',
+  lang: 'en',
   limit: 20,
+  offset: 0,
   sort: 'created_at',
-  order: 'desc'
-})
-
-// Server-side search (v0.3.0+)
-const results = await client.getPosts({
+  order: 'desc',
   search: 'react',
-  searchFields: ['title', 'excerpt']
-})
-
-// With ISR caching (v0.4.1+)
-const cachedPosts = await client.getPosts({
-  limit: 10,
-  next: { revalidate: 60 }  // Cache for 60s
-})
-
-// With cache tags for on-demand revalidation
-const taggedPosts = await client.getPosts({
-  next: {
-    revalidate: 3600,
-    tags: ['posts', 'homepage']
-  }
-})
-
-// No cache (always fresh)
-const freshPosts = await client.getPosts({
-  search: 'keyword',
+  searchFields: ['title', 'excerpt'],
+  next: { revalidate: 60 },
   cache: 'no-store'
 })
+```
+
+#### `getPaginatedPosts(params?)`
+
+Get paginated posts with metadata (total count, total pages).
+
+```typescript
+const response = await client.getPaginatedPosts({
+  lang: 'en',
+  page: 1,
+  pageSize: 20,
+  sort: 'created_at',
+  order: 'desc',
+  search: 'react',
+  next: { revalidate: 60 }
+})
+
+// Response:
+// {
+//   items: V2PostListItem[],
+//   page: number,
+//   pageSize: number,
+//   totalCount: number,
+//   totalPages: number,
+//   hasNextPage: boolean,
+//   hasPreviousPage: boolean
+// }
 ```
 
 #### `getPost(slug, options?)`
 
 Get a single post with full content by slug.
 
-**Parameters:**
-- `slug: string` - Post slug (required)
-- `options?: GetPostOptions` - Optional configuration
-
 ```typescript
-interface GetPostOptions {
-  lang?: SupportedLanguage  // Language code
-  next?: NextFetchOptions    // 🆕 Next.js ISR cache (v0.4.1+)
-  cache?: RequestCache       // 🆕 Standard fetch cache (v0.4.1+)
-}
-```
-
-**Returns:** `Promise<V2Post>`
-
-**Examples:**
-```typescript
-// Basic usage
 const post = await client.getPost('my-article-slug', {
-  lang: 'zh'
-})
-
-// With ISR caching (v0.4.1+)
-const cachedPost = await client.getPost('my-article-slug', {
-  lang: 'zh',
-  next: { revalidate: 3600 }  // Cache for 1 hour
-})
-
-// With cache tags for on-demand revalidation
-const taggedPost = await client.getPost('my-article-slug', {
-  next: {
-    revalidate: 3600,
-    tags: ['posts', 'my-article-slug']
-  }
-})
-
-// No cache (always fresh)
-const freshPost = await client.getPost('my-article-slug', {
+  lang: 'en',
+  next: { revalidate: 3600 },
   cache: 'no-store'
 })
+```
+
+### React Hooks
+
+#### `useBlogPosts(options?)`
+
+Fetch and manage blog posts with pagination. **Now supports server-side search** - when `search` parameter is provided, it sends API requests instead of client-side filtering.
+
+```typescript
+const { 
+  posts, 
+  loading, 
+  error, 
+  hasMore, 
+  totalCount, 
+  currentPage, 
+  totalPages,
+  loadMore,
+  refresh,
+  fetchPage
+} = useBlogPosts({
+  lang: 'en',
+  page: 1,
+  pageSize: 20,
+  search: 'react', // Server-side search (v1.0.0+)
+  sort: 'created_at',
+  order: 'desc',
+  autoFetch: true
+})
+```
+
+#### `useBlogPost(slug, options?)`
+
+Fetch a single post by slug.
+
+```typescript
+const { post, loading, error, refresh } = useBlogPost('my-slug', {
+  lang: 'en'
+})
+```
+
+#### `useBlogSearch(options)`
+
+Server-side search with auto-debouncing.
+
+```typescript
+const { 
+  results, 
+  loading, 
+  error, 
+  totalCount,
+  page,
+  totalPages,
+  hasNextPage,
+  setPage
+} = useBlogSearch({
+  searchTerm: 'react',
+  debounceMs: 300,
+  lang: 'en',
+  limit: 20,
+  sort: 'created_at',
+  order: 'desc'
+})
+```
+
+### React Components
+
+#### Pre-built Components
+
+All components support `className` for custom styling and can be used in both Server and Client Components:
+
+- `BlogPostCard` - Single post card
+- `BlogPostList` - List of posts (supports `posts` prop for server-rendered data)
+- `BlogPostWaterfall` - Waterfall layout
+- `BlogPostMagazine` - Magazine layout
+- `BlogPostDense` - Dense list layout
+- `BlogPostTimeline` - Timeline layout
+- `BlogPostFullscreen` - Fullscreen layout
+- `BlogPostFast` - Fast loading layout
+- `BlogPostModern` - Modern layout
+- `BlogPostCarousel` - Carousel layout
+- `BlogSearch` - Search component (with server-side search support)
+- `Pagination` - Pagination controls
+
+**Custom Styling with `className`:**
+
+All components accept `className` prop for custom styling:
+
+```tsx
+import { BlogPostList, Pagination } from '@blogflow/sdk/react'
+
+<BlogPostList 
+  posts={posts} 
+  className="my-custom-class"
+  onPostClick={(slug) => router.push(`/posts/${slug}`)}
+/>
+
+<Pagination
+  currentPage={currentPage}
+  totalPages={totalPages}
+  onPageChange={fetchPage}
+  className="my-pagination"
+/>
 ```
 
 ## Type Definitions
 
 ### V2PostListItem
-
-Minimal post data returned from `getPosts()`:
 
 ```typescript
 interface V2PostListItem {
@@ -493,8 +566,6 @@ interface V2PostListItem {
 ```
 
 ### V2Post
-
-Full post data returned from `getPost()`:
 
 ```typescript
 interface V2Post {
@@ -512,9 +583,17 @@ interface V2Post {
 }
 ```
 
-## Error Handling
+### Supported Languages
 
-The SDK provides custom error classes for different error scenarios:
+- `en` - English
+- `zh` - Chinese
+- `es` - Spanish
+- `fr` - French
+- `de` - German
+- `ja` - Japanese
+- `ko` - Korean
+
+## Error Handling
 
 ```typescript
 import { 
@@ -522,7 +601,7 @@ import {
   BlogFlowAuthError,
   BlogFlowNotFoundError,
   BlogFlowServerError
-} from '@blogflow/sdk'
+} from '@blogflow/sdk/core'
 
 try {
   const post = await client.getPost('my-slug')
@@ -543,32 +622,24 @@ try {
 }
 ```
 
-## Supported Languages
-
-- `en` - English
-- `zh` - Chinese
-- `es` - Spanish
-- `fr` - French
-- `de` - German
-- `ja` - Japanese
-- `ko` - Korean
-
 ## Examples
 
 ### Next.js App Router (Server Component)
 
 ```typescript
 // app/posts/page.tsx
-import { BlogFlow } from '@blogflow/sdk'
+import { BlogFlow } from '@blogflow/sdk/core'
 
-// Create client instance (server-side only)
 const client = new BlogFlow({
-  apiKey: process.env.BLOGFLOW_API_KEY!, // From .env.local
-  defaultLanguage: 'zh'
+  apiKey: process.env.BLOGFLOW_API_KEY!,
+  defaultLanguage: 'en'
 })
 
 export default async function PostsPage() {
-  const posts = await client.getPosts({ limit: 10 })
+  const posts = await client.getPosts({ 
+    limit: 10,
+    next: { revalidate: 60 }
+  })
   
   return (
     <div>
@@ -585,22 +656,20 @@ export default async function PostsPage() {
 
 ### Next.js API Route (Recommended for Security)
 
-For better security, create an API route to proxy requests:
-
 ```typescript
 // app/api/posts/route.ts
-import { BlogFlow } from '@blogflow/sdk'
+import { BlogFlow } from '@blogflow/sdk/core'
 import { NextResponse } from 'next/server'
 
 const client = new BlogFlow({
-  apiKey: process.env.BLOGFLOW_API_KEY!, // Server-side only
-  defaultLanguage: 'zh'
+  apiKey: process.env.BLOGFLOW_API_KEY!,
+  defaultLanguage: 'en'
 })
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const limit = parseInt(searchParams.get('limit') || '20')
-  const lang = searchParams.get('lang') as any || 'zh'
+  const lang = searchParams.get('lang') as any || 'en'
   
   try {
     const posts = await client.getPosts({ limit, lang })
@@ -614,74 +683,68 @@ export async function GET(request: Request) {
 }
 ```
 
-Then call from client:
-
-```typescript
-// Client component
-const response = await fetch('/api/posts?limit=10&lang=zh')
-const posts = await response.json()
-```
-
-### React Client Component
-
-**Option 1: Using Environment Variable (Less Secure)**
+### React Client Component with Hooks
 
 ```typescript
 'use client'
 
-import { useEffect, useState } from 'react'
-import { BlogFlow, V2PostListItem } from '@blogflow/sdk'
+import { BlogFlowProvider, useBlogPosts, BlogPostList } from '@blogflow/sdk/react'
 
-export function PostsList() {
-  const [posts, setPosts] = useState<V2PostListItem[]>([])
-  
-  useEffect(() => {
-    const client = new BlogFlow({
+export default function PostsPage() {
+  return (
+    <BlogFlowProvider config={{ 
       apiKey: process.env.NEXT_PUBLIC_BLOGFLOW_API_KEY!,
-      defaultLanguage: 'zh'
-    })
-    
-    client.getPosts({ limit: 10 })
-      .then(setPosts)
-      .catch(console.error)
-  }, [])
-  
+      styles: { theme: 'default' }
+    }}>
+      <PostsList />
+    </BlogFlowProvider>
+  )
+}
+
+function PostsList() {
+  const { posts, loading, error, totalPages, currentPage, fetchPage } = useBlogPosts({
+    lang: 'en',
+    pageSize: 20
+  })
+
+  if (loading) return <p>Loading...</p>
+  if (error) return <p>Error: {error}</p>
+
   return (
     <div>
-      {posts.map(post => (
-        <div key={post.id}>{post.title}</div>
-      ))}
+      <BlogPostList posts={posts} />
+      <div>
+        {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+          <button 
+            key={page} 
+            onClick={() => fetchPage(page)}
+            disabled={page === currentPage}
+          >
+            {page}
+          </button>
+        ))}
+      </div>
     </div>
   )
 }
 ```
 
-**Option 2: Using API Route (Recommended - More Secure)**
+## Package Exports
+
+The SDK provides multiple entry points for tree-shaking:
 
 ```typescript
-'use client'
+// Core client (Node.js, SSR)
+import { BlogFlow } from '@blogflow/sdk/core'
 
-import { useEffect, useState } from 'react'
-import { V2PostListItem } from '@blogflow/sdk'
+// React hooks and components
+import { BlogFlowProvider, useBlogPosts } from '@blogflow/sdk/react'
 
-export function PostsList() {
-  const [posts, setPosts] = useState<V2PostListItem[]>([])
-  
-  useEffect(() => {
-    fetch('/api/posts?limit=10&lang=zh')
-      .then(res => res.json())
-      .then(setPosts)
-      .catch(console.error)
-  }, [])
-  
-  return (
-    <div>
-      {posts.map(post => (
-        <div key={post.id}>{post.title}</div>
-      ))}
-    </div>
-  )
-}
+// Default export (re-exports core)
+import { BlogFlow } from '@blogflow/sdk'
+
+// Theme CSS files
+import '@blogflow/sdk/styles/default.css'
 ```
 
 ## License
@@ -693,5 +756,4 @@ MIT
 ## Author & Support
 
 **Author:** [Ausdata Science Pty Ltd](https://ausdata.ai)  
-**Support:** [Ausdata Lab](https://ausdata.org)
-
+**Support:** [Ausdata Lab](https://www.ausdata.org) | [Ausdata Matrix](https://www.ausdata.app)

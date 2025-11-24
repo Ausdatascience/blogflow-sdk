@@ -1,7 +1,7 @@
 {
   "name": "@blogflow/sdk",
-  "version": "0.6.3",
-  "description": "TypeScript SDK for BlogFlow API Server v2 - A lightweight client for fetching blog posts with multilingual support and server-side search",
+  "version": "1.0.0",
+  "description": "TypeScript SDK for BlogFlow API Server v2 - A lightweight, high-performance client for fetching blog posts with server-side search, Next.js ISR caching, and multilingual support",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -75,8 +75,5 @@
     "tsup": "^8.5.1",
     "tsx": "^4.19.0",
     "typescript": "^5.9.3"
-  },
-  "dependencies": {
-    "@blogflow/sdk": "0.6.0"
   }
 }

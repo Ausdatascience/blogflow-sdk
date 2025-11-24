@@ -17,6 +17,7 @@ import { eyecareTheme } from './eyecare'
 import { purewhiteTheme } from './purewhite'
 import { pureblackTheme } from './pureblack'
 import { cyanblueTheme } from './cyanblue'
+import { violetTheme } from './violet'
 import type { Theme, ThemeName } from '../types'
 
 export const themes: Record<Exclude<ThemeName, 'none'>, Theme> = {
@@ -34,6 +35,7 @@ export const themes: Record<Exclude<ThemeName, 'none'>, Theme> = {
   purewhite: purewhiteTheme,
   pureblack: pureblackTheme,
   cyanblue: cyanblueTheme,
+  violet: violetTheme,
 }
 
 export function getTheme(name: ThemeName): Theme | null {
@@ -56,5 +58,6 @@ export {
   purewhiteTheme,
   pureblackTheme,
   cyanblueTheme,
+  violetTheme,
 }
 

@@ -17,7 +17,7 @@ import {
   BlogFlowNotFoundError,
   BlogFlowServerError,
   NextFetchOptions,
-} from './types'
+} from '../types'
 
 const DEFAULT_BASE_URL = 'https://blogflow-api-server.vercel.app/api/v2'
 
@@ -288,3 +288,4 @@ export class BlogFlow {
     return this.request<V2PaginatedPostsResponse>(endpoint, fetchOptions)
   }
 }
+
