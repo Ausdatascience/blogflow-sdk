@@ -16,7 +16,7 @@ export type SupportedLanguage = 'en' | 'zh' | 'es' | 'fr' | 'de' | 'ja' | 'ko'
 export interface BlogFlowConfig {
   /** API Key for authentication */
   apiKey: string
-  /** Base URL of the API server (default: https://blogflow-api-server.vercel.app/api/v2) */
+  /** Base URL of the API server (default: https://api.blogflow.com.au/api/v2) */
   baseUrl?: string
   /** Default language for requests */
   defaultLanguage?: SupportedLanguage

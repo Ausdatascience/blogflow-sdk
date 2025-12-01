@@ -9,12 +9,12 @@
 
 *Built by [Ausdata Science](https://ausdata.ai) | Powered by [Ausdata Matrix](https://www.ausdata.app) & [Ausdata Lab](https://www.ausdata.org)*
 
-## 🚀 v1.0.1 - Latest Release
+## 🚀 v1.0.2 - Latest Release
 
 **What's New:**
-- 🐛 **Fixed Infinite Loop Issues** - Resolved React hooks dependency issues that caused "Maximum update depth exceeded" errors
-- 🔧 **Performance Improvements** - Optimized useEffect dependencies to prevent unnecessary re-renders
-- ✨ **Stability Enhancements** - Improved state management in `useBlogPosts`, `useBlogSearch`, and `useServerSearch` hooks
+- 🔄 **Updated API Endpoint** - Default API base URL changed to `https://api.blogflow.com.au/api/v2`
+- 🐛 **Fixed Infinite Loop Issues** (v1.0.1) - Resolved React hooks dependency issues that caused "Maximum update depth exceeded" errors
+- 🔧 **Performance Improvements** (v1.0.1) - Optimized useEffect dependencies to prevent unnecessary re-renders
 
 ## 🚀 Quick Start with BlogFlowUI
 
@@ -81,7 +81,10 @@ That's it! You now have a fully functional blog with:
 
 ## Changelog
 
-### v1.0.1 (Latest)
+### v1.0.2 (Latest)
+- 🔄 **Updated API Endpoint** - Changed default API base URL to `https://api.blogflow.com.au/api/v2`
+
+### v1.0.1
 - 🐛 **Fixed Infinite Loop Issues** - Resolved React hooks dependency issues in `useBlogPosts`, `useBlogSearch`, and `useServerSearch` that caused "Maximum update depth exceeded" errors
 - 🔧 **Performance Improvements** - Optimized useEffect dependencies using refs to prevent unnecessary re-renders
 - ✨ **Stability Enhancements** - Improved state management and page update logic
@@ -344,7 +347,7 @@ Create a `.env.local` file:
 
 ```bash
 BLOGFLOW_API_KEY=your-api-key-here
-BLOGFLOW_API_URL=https://blogflow-api-server.vercel.app/api/v2  # optional
+BLOGFLOW_API_URL=https://api.blogflow.com.au/api/v2  # optional
 ```
 
 ```typescript
@@ -382,7 +385,7 @@ import { BlogFlow, createClient } from '@blogflow/sdk/core'
 
 const client = new BlogFlow({
   apiKey: 'your-api-key-here',
-  baseUrl: 'https://blogflow-api-server.vercel.app/api/v2',
+  baseUrl: 'https://api.blogflow.com.au/api/v2',
   defaultLanguage: 'en'
 })
 
