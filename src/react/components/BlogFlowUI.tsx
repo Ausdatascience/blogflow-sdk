@@ -5,7 +5,7 @@
 
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { BlogFlowProvider } from '../context/BlogFlowContext'
 import { useBlogPosts } from '../hooks/useBlogPosts'
 import { useBlogSearch } from '../hooks/useBlogSearch'
@@ -173,40 +173,62 @@ function BlogFlowContent({
 
   // Dynamic theme injection
   useEffect(() => {
-    const link = document.createElement('link')
-    link.rel = 'stylesheet'
-    link.href = `https://cdn.jsdelivr.net/npm/@blogflow/sdk@1.0.0/dist/styles/${currentTheme}.css`
-    link.id = 'blogflow-theme'
-
     const existingLink = document.getElementById('blogflow-theme')
+    
+    // Only update if theme changed
     if (existingLink) {
-      existingLink.remove()
-    }
-
-    document.head.appendChild(link)
-
-    return () => {
-      link.remove()
+      const currentHref = existingLink.getAttribute('href')
+      const newHref = `https://cdn.jsdelivr.net/npm/@blogflow/sdk@1.0.0/dist/styles/${currentTheme}.css`
+      
+      if (currentHref === newHref) {
+        return // Theme hasn't changed, do nothing
+      }
+      
+      existingLink.setAttribute('href', newHref)
+    } else {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = `https://cdn.jsdelivr.net/npm/@blogflow/sdk@1.0.0/dist/styles/${currentTheme}.css`
+      link.id = 'blogflow-theme'
+      document.head.appendChild(link)
     }
   }, [currentTheme])
 
-  // Render different view components
-  const renderPostsView = () => {
-    const commonProps = {
+  // Memoize click handler
+  const handlePostClick = useCallback(
+    (slug: string) => {
+      if (onPostClick) {
+        onPostClick(slug)
+      } else {
+        console.log('Post clicked:', slug)
+      }
+    },
+    [onPostClick]
+  )
+
+  // Memoize card props
+  const cardProps = useMemo(
+    () => ({
+      showExcerpt,
+      showCategory,
+      showDate,
+    }),
+    [showExcerpt, showCategory, showDate]
+  )
+
+  // Memoize common props
+  const commonProps = useMemo(
+    () => ({
       posts: displayPosts,
       language,
-      onPostClick:
-        onPostClick ||
-        ((slug: string) => {
-          console.log('Post clicked:', slug)
-        }),
-      cardProps: {
-        showExcerpt,
-        showCategory,
-        showDate,
-      },
-    }
+      onPostClick: handlePostClick,
+      cardProps,
+    }),
+    [displayPosts, language, handlePostClick, cardProps]
+  )
 
+  // Render different view components
+  const renderPostsView = () => {
     switch (viewMode) {
       case 'waterfall':
         return <BlogPostWaterfall {...commonProps} />
