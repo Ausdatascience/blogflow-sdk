@@ -137,12 +137,21 @@ function BlogFlowContent({
     currentPage,
     totalPages,
     totalCount,
-    fetchPage,
-    refresh,
+    fetchPage: originalFetchPage,
+    refresh: originalRefresh,
   } = useBlogPosts({
     lang: language,
     pageSize,
   })
+
+  // Wrap functions to ensure stable references
+  const fetchPage = useCallback((page: number) => {
+    originalFetchPage(page)
+  }, [originalFetchPage])
+
+  const refresh = useCallback(() => {
+    originalRefresh()
+  }, [originalRefresh])
 
   // Search functionality
   const {
@@ -152,7 +161,7 @@ function BlogFlowContent({
     totalCount: searchTotalCount,
     page: searchPage,
     totalPages: searchTotalPages,
-    setPage: setSearchPage,
+    setPage: originalSetSearchPage,
   } = useBlogSearch(
     {
       searchTerm,
@@ -164,6 +173,11 @@ function BlogFlowContent({
     },
     searchMode === 'client' ? posts : undefined
   )
+
+  // Wrap setPage to ensure stable reference
+  const setSearchPage = useCallback((page: number) => {
+    originalSetSearchPage(page)
+  }, [originalSetSearchPage])
 
   const displayPosts = searchTerm ? results : posts
   const loading = postsLoading || searchLoading
