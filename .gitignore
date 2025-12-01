@@ -5,6 +5,10 @@ node_modules/
 dist/
 *.tsbuildinfo
 
+# Packaged files (should not be committed - use npm publish instead)
+*.tgz
+*.tar.gz
+
 # Lock files (optional - some projects commit these, but for SDKs it's usually ignored)
 # Uncomment if you want to commit lock files
 # package-lock.json

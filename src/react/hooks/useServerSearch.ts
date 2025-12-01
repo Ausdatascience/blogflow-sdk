@@ -126,6 +126,12 @@ export function useServerSearch(
     }
   }, [client, searchFields, limit, sort, order, lang])
 
+  // Use ref to store latest performSearch to avoid infinite loops
+  const performSearchRef = useRef(performSearch)
+  useEffect(() => {
+    performSearchRef.current = performSearch
+  }, [performSearch])
+
   // Debounced search effect
   useEffect(() => {
     if (!autoSearch) return
@@ -145,7 +151,7 @@ export function useServerSearch(
 
     // Set new timer
     debounceTimerRef.current = setTimeout(() => {
-      performSearch()
+      performSearchRef.current()
     }, debounceMs)
 
     // Cleanup
@@ -154,7 +160,7 @@ export function useServerSearch(
         clearTimeout(debounceTimerRef.current)
       }
     }
-  }, [searchTerm, autoSearch, debounceMs, performSearch])
+  }, [searchTerm, autoSearch, debounceMs])
 
   const clear = useCallback(() => {
     setResults([])

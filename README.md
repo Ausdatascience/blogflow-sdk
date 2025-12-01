@@ -7,26 +7,18 @@
 
 **The AI Content Engine for Next.js & React** - A lightweight, high-performance TypeScript SDK for BlogFlow API Server v2 with **server-side search**, **Next.js ISR caching**, and **multilingual support**.
 
-<<<<<<< HEAD
 *Built by [Ausdata Science](https://ausdata.ai) | Powered by [Ausdata Matrix](https://www.ausdata.app) & [Ausdata Lab](https://www.ausdata.org)*
 
-## 🚀 v1.0.0
+## 🚀 v1.0.1 - Latest Release
 
-- **hybrid architecture** that combines the best of server-side and client-side rendering:
+**What's New:**
+- 🐛 **Fixed Infinite Loop Issues** - Resolved React hooks dependency issues that caused "Maximum update depth exceeded" errors
+- 🔧 **Performance Improvements** - Optimized useEffect dependencies to prevent unnecessary re-renders
+- ✨ **Stability Enhancements** - Improved state management in `useBlogPosts`, `useBlogSearch`, and `useServerSearch` hooks
 
-- **🔀 Hybrid Architecture** - Server-side rendering (SSR) for SEO and performance, client-side for rich interactions
-- **⚡ Smart Caching** - Built-in support for Next.js ISR (Incremental Static Regeneration) to significantly reduce API calls
-- **🔍 Server-Side Search** - High-performance search across entire datasets with database indexes
-- **🏗️ Production-Ready** - Powered by [Ausdata Matrix](https://www.ausdata.app) infrastructure for enterprise-grade reliability
-
-## ✨ Features
-
-- 🚀 **Server-Side Search** - Search entire database with database indexes for faster and more accurate results
-- ⚡ **Next.js ISR Caching** - Reduce API requests significantly with Incremental Static Regeneration
-=======
 ## 🚀 Quick Start with BlogFlowUI
 
-**NEW in v1.0.0:** The easiest way to get started - one line of code for a complete blog interface!
+**The easiest way to get started** - one line of code for a complete blog interface!
 
 ```tsx
 import { BlogFlowUI } from '@blogflow/sdk/react'
@@ -71,24 +63,35 @@ That's it! You now have a fully functional blog with:
 />
 ```
 
-## ✨ Key Features (v0.6.3)
+## ✨ Key Features
 
-- 🎁 **BlogFlowUI Component** - **NEW** - Complete blog interface in one line of code
+- 🎁 **BlogFlowUI Component** - Complete blog interface in one line of code
 - 🚀 **Server-Side Search** - Search entire database, not just loaded posts (10-100x faster)
 - ⚡ **Next.js ISR Caching** - Reduce API requests by 98%+ with Incremental Static Regeneration
->>>>>>> 9469723e0c9035cc4c16cb7959ecb7e3d3af5690
+- 🔀 **Hybrid Architecture** - Server-side rendering (SSR) for SEO and performance, client-side for rich interactions
+- 🏗️ **Production-Ready** - Powered by [Ausdata Matrix](https://www.ausdata.app) infrastructure for enterprise-grade reliability
 - 🎯 **React Hooks** - `useBlogPosts`, `useBlogPost`, `useBlogSearch` with auto-debouncing
 - 🌍 **Multilingual** - Multiple languages support (en, zh, es, fr, de, ja, ko)
 - 📦 **TypeScript First** - Full type safety with comprehensive type definitions
-<<<<<<< HEAD
-- 🎨 **Built-in Themes** - Multiple beautiful themes with zero-config styling
-=======
 - 🎨 **Built-in Themes** - 16 beautiful themes with zero-config styling
->>>>>>> 9469723e0c9035cc4c16cb7959ecb7e3d3af5690
 - 🎭 **Auto-Inject Styles** - Automatic CSS injection, no manual imports needed
 - 🔧 **Fully Customizable** - Pre-built React components with `className` support
 - 🔒 **SSR Ready** - Works in Node.js, Next.js server components, and browsers
 - 📄 **Pagination Support** - Built-in pagination with `getPaginatedPosts` and pagination components
+
+## Changelog
+
+### v1.0.1 (Latest)
+- 🐛 **Fixed Infinite Loop Issues** - Resolved React hooks dependency issues in `useBlogPosts`, `useBlogSearch`, and `useServerSearch` that caused "Maximum update depth exceeded" errors
+- 🔧 **Performance Improvements** - Optimized useEffect dependencies using refs to prevent unnecessary re-renders
+- ✨ **Stability Enhancements** - Improved state management and page update logic
+
+### v1.0.0
+- 🎁 **BlogFlowUI Component** - Complete blog interface in one line of code
+- 🚀 **Server-Side Search** - High-performance search across entire datasets
+- ⚡ **Next.js ISR Caching** - Built-in support for Incremental Static Regeneration
+- 🔀 **Hybrid Architecture** - Server-side and client-side rendering support
+- 🎨 **16 Built-in Themes** - Beautiful themes with zero-config styling
 
 ## System Requirements
 

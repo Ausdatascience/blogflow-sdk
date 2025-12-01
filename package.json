@@ -1,11 +1,7 @@
 {
   "name": "@blogflow/sdk",
-  "version": "1.0.0",
-<<<<<<< HEAD
+  "version": "1.0.1",
   "description": "TypeScript SDK for BlogFlow API Server v2 - A lightweight, high-performance client for fetching blog posts with server-side search, Next.js ISR caching, and multilingual support",
-=======
-  "description": "TypeScript SDK for BlogFlow API Server v2 - A lightweight client for fetching blog posts with multilingual support and server-side search",
->>>>>>> 9469723e0c9035cc4c16cb7959ecb7e3d3af5690
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",

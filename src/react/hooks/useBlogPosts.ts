@@ -3,7 +3,7 @@
  * Fetches and manages blog posts list with pagination support
  */
 
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { V2PostListItem, V2GetPostsParams, V2GetPaginatedPostsParams, SupportedLanguage } from '../../core'
 import { useBlogFlowClient } from '../context/BlogFlowContext'
 
@@ -64,20 +64,36 @@ export function useBlogPosts(options: UseBlogPostsOptions = {}): UseBlogPostsRet
   const [totalCount, setTotalCount] = useState(0)
   const [totalPages, setTotalPages] = useState(1)
   const [currentPage, setCurrentPage] = useState(page)
+  
+  // Use ref to track the latest fetchPosts function to avoid infinite loops
+  const fetchPostsRef = useRef<((targetPage: number, append: boolean) => Promise<void>) | null>(null)
 
   // Stabilize searchFields array to avoid unnecessary re-renders
-  // Compare array contents instead of reference
+  // Store in ref to avoid dependency issues
+  const searchFieldsRef = useRef(searchFields)
+  const searchFieldsStringRef = useRef<string>('')
   const stableSearchFields = useMemo(() => {
-    if (!searchFields) return undefined
-    return searchFields.length > 0 ? [...searchFields] : undefined
-  }, [JSON.stringify(searchFields)])
+    if (!searchFields) {
+      searchFieldsRef.current = undefined
+      searchFieldsStringRef.current = ''
+      return undefined
+    }
+    const currentString = JSON.stringify(searchFields)
+    // Only create new array if content actually changed
+    if (currentString === searchFieldsStringRef.current && searchFieldsRef.current) {
+      return searchFieldsRef.current
+    }
+    searchFieldsStringRef.current = currentString
+    const newValue = searchFields.length > 0 ? [...searchFields] : undefined
+    searchFieldsRef.current = newValue
+    return newValue
+  }, [searchFields])
 
   // Memoize other params (like limit, offset) that don't need to trigger refetch
-  const stableOtherParams = useMemo(() => ({ ...otherParams }), [
-    // Only include stable params that don't change frequently
-    otherParams.limit,
-    otherParams.offset,
-  ])
+  // Use JSON.stringify to ensure deep equality check
+  const stableOtherParams = useMemo(() => {
+    return { ...otherParams }
+  }, [JSON.stringify(otherParams)])
 
   const fetchPosts = useCallback(async (
     targetPage: number,
@@ -160,19 +176,23 @@ export function useBlogPosts(options: UseBlogPostsOptions = {}): UseBlogPostsRet
     stableOtherParams,
   ])
 
-  // Update currentPage when page prop changes
+  // Store the latest fetchPosts function in ref
   useEffect(() => {
-    setCurrentPage(page)
-  }, [page])
+    fetchPostsRef.current = fetchPosts
+  }, [fetchPosts])
 
+  // Store searchFields string for comparison
+  const searchFieldsString = useMemo(() => JSON.stringify(searchFields || []), [searchFields])
+  
   // Fetch posts when any query parameter changes
-  // Note: fetchPosts is included in dependencies as it's used in the effect
-  // All query parameters (search, sort, order, etc.) are already dependencies of fetchPosts
+  // Use ref to avoid including fetchPosts in dependencies (which causes infinite loops)
+  // Note: stableOtherParams and stableSearchFields are not in dependencies because they're already handled by fetchPosts ref
   useEffect(() => {
-    if (autoFetch) {
-      fetchPosts(page, false)
+    if (autoFetch && fetchPostsRef.current) {
+      fetchPostsRef.current(page, false)
     }
-  }, [autoFetch, page, fetchPosts])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoFetch, page, lang, pageSize, search, sort, order, next, cache, searchFieldsString])
 
   const loadMore = useCallback(async () => {
     if (hasMore && !loading) {

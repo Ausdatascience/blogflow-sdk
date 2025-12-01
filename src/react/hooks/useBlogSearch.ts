@@ -136,15 +136,28 @@ export function useBlogSearch(
   const updatePage = useCallback((nextPage: number) => {
     const safePage = Math.max(1, Math.floor(nextPage) || 1)
     pageRef.current = safePage
-    setPageState(safePage)
+    // Use functional update to avoid unnecessary re-renders
+    setPageState(prevPage => {
+      if (prevPage !== safePage) {
+        return safePage
+      }
+      return prevPage
+    })
   }, [])
 
   useEffect(() => {
     if (mode !== 'server') return
     const normalized = Math.max(1, Math.floor(initialPage) || 1)
+    // Only update if the normalized page is different from ref (to avoid unnecessary updates)
     if (normalized !== pageRef.current) {
       pageRef.current = normalized
-      setPageState(normalized)
+      // Only update state if it's actually different to avoid re-renders
+      setPageState(prevPage => {
+        if (normalized !== prevPage) {
+          return normalized
+        }
+        return prevPage
+      })
     }
   }, [initialPage, mode])
 
@@ -232,6 +245,12 @@ export function useBlogSearch(
     })
   }, [clientPosts, searchTerm, searchFields, caseSensitive, mode])
 
+  // Use ref to store latest performServerSearch to avoid infinite loops
+  const performServerSearchRef = useRef(performServerSearch)
+  useEffect(() => {
+    performServerSearchRef.current = performServerSearch
+  }, [performServerSearch])
+
   // Debounced search effect (server mode only)
   useEffect(() => {
     if (mode !== 'server' || !autoSearch) return
@@ -250,12 +269,15 @@ export function useBlogSearch(
         hasNextPage: false,
         hasPreviousPage: false,
       })
-      updatePage(1)
+      // Use ref to update page without causing re-render loop
+      const safePage = 1
+      pageRef.current = safePage
+      setPageState(prevPage => prevPage !== safePage ? safePage : prevPage)
       return
     }
 
     debounceTimerRef.current = setTimeout(() => {
-      performServerSearch(1)
+      performServerSearchRef.current(1)
     }, debounceMs)
 
     return () => {
@@ -263,7 +285,7 @@ export function useBlogSearch(
         clearTimeout(debounceTimerRef.current)
       }
     }
-  }, [searchTerm, autoSearch, debounceMs, performServerSearch, mode])
+  }, [searchTerm, autoSearch, debounceMs, mode])
 
   const clear = useCallback(() => {
     if (mode === 'server') {
