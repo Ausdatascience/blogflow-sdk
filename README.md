@@ -5,15 +5,63 @@
 
 TypeScript SDK for BlogFlow API Server v2 - A lightweight, high-performance client for fetching blog posts with **server-side search**, **Next.js ISR caching**, and **multilingual support**.
 
-## ✨ Key Features (v0.6.2)
+## 🚀 Quick Start with BlogFlowUI
 
+**NEW in v1.0.0:** The easiest way to get started - one line of code for a complete blog interface!
+
+```tsx
+import { BlogFlowUI } from '@blogflow/sdk/react'
+
+export default function BlogPage() {
+  return <BlogFlowUI apiKey="your-api-key" />
+}
+```
+
+That's it! You now have a fully functional blog with:
+- ✅ 16 built-in themes with live preview
+- ✅ 12 view modes (card, list, grid, magazine, etc.)
+- ✅ Server-side & client-side search
+- ✅ Multi-language support
+- ✅ Complete pagination
+- ✅ Responsive design
+
+### Custom Configuration
+
+```tsx
+<BlogFlowUI
+  apiKey="your-api-key"
+  defaultLanguage="en"
+  defaultTheme="dark"
+  defaultViewMode="magazine"
+  pageSize={20}
+  title="My Blog"
+  showControlPanel={true}
+  showCardOptions={true}
+  onPostClick={(slug) => router.push(`/post/${slug}`)}
+/>
+```
+
+### Minimal Version
+
+```tsx
+<BlogFlowUI
+  apiKey="your-api-key"
+  showControlPanel={false}
+  showCardOptions={false}
+  defaultTheme="minimal"
+/>
+```
+
+## ✨ Key Features (v0.6.3)
+
+- 🎁 **BlogFlowUI Component** - **NEW** - Complete blog interface in one line of code
 - 🚀 **Server-Side Search** - Search entire database, not just loaded posts (10-100x faster)
 - ⚡ **Next.js ISR Caching** - Reduce API requests by 98%+ with Incremental Static Regeneration
 - 🎯 **React Hooks** - `useBlogPosts`, `useBlogPost`, `useBlogSearch` with auto-debouncing
 - 🌍 **Multilingual** - Support for 7 languages (en, zh, es, fr, de, ja, ko)
 - 📦 **TypeScript First** - Full type safety with comprehensive type definitions
-- 🎨 **Built-in Themes** - **NEW** - 14 beautiful themes with zero-config styling
-- 🎭 **Auto-Inject Styles** - **NEW** - Automatic CSS injection, no manual imports needed
+- 🎨 **Built-in Themes** - 16 beautiful themes with zero-config styling
+- 🎭 **Auto-Inject Styles** - Automatic CSS injection, no manual imports needed
 - 🔧 **Fully Customizable** - Pre-built React components with `className` support
 - 🔒 **SSR Ready** - Works in Node.js, Next.js server components, and browsers
 

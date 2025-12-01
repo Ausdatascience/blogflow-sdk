@@ -57,6 +57,9 @@ export type { BlogSearchProps } from './components/BlogSearch'
 export { Pagination } from './components/Pagination'
 export type { PaginationProps, PaginationVariant } from './components/Pagination'
 
+export { BlogFlowUI } from './components/BlogFlowUI'
+export type { BlogFlowUIConfig } from './components/BlogFlowUI'
+
 // Re-export core types for convenience
 export type {
   V2PostListItem,
