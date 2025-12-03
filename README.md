@@ -9,12 +9,17 @@
 
 *Built by [Ausdata Science](https://ausdata.ai) | Powered by [Ausdata Matrix](https://www.ausdata.app) & [Ausdata Lab](https://www.ausdata.org)*
 
-## 🚀 v1.0.2 - Latest Release
+## 🚀 v1.0.3 - Latest Release
 
-**What's New:**
-- 🔄 **Updated API Endpoint** - Default API base URL changed to `https://api.blogflow.com.au/api/v2`
-- 🐛 **Fixed Infinite Loop Issues** (v1.0.1) - Resolved React hooks dependency issues that caused "Maximum update depth exceeded" errors
-- 🔧 **Performance Improvements** (v1.0.1) - Optimized useEffect dependencies to prevent unnecessary re-renders
+**What's New in v1.0.3:**
+- 🧩 **More Flexible BlogFlowUI**  
+  - Added `showLanguageToggle` to control visibility of the language switcher in the search bar  
+  - Added `showSearchBar` to completely hide or show the search bar  
+  - Added `paginationPosition` (`'top' | 'bottom' | 'both'`) to control where pagination appears  
+  - Added `defaultPaginationVariant` and documented all pagination styles
+- 📖 **Improved Documentation**  
+  - Updated README with full lists of themes, view modes, search options, and pagination variants  
+  - Added practical configuration examples for common use cases (full search, no language toggle, no search bar)
 
 ## 🚀 Quick Start with BlogFlowUI
 
@@ -52,6 +57,7 @@ That's it! You now have a fully functional blog with:
   showControlPanel={true}
   showCardOptions={true}
   showLanguageToggle={true}
+  showSearchBar={true}
   onPostClick={(slug) => router.push(`/post/${slug}`)}
 />
 ```
@@ -126,6 +132,39 @@ That's it! You now have a fully functional blog with:
   - **`client`**: Filter already-loaded posts in the browser.
 - **showLanguageToggle** `boolean` (default: `true`):
   - Whether to show the language switcher button in the search bar.
+- **showSearchBar** `boolean` (default: `true`):
+  - Whether to show the entire search bar (search input, language toggle, result count).
+
+**Common Search Configurations:**
+
+- **Full search experience (default)**
+
+  ```tsx
+  <BlogFlowUI
+    apiKey="your-api-key"
+    defaultSearchMode="server"
+    showSearchBar={true}
+    showLanguageToggle={true}
+  />
+  ```
+
+- **Hide language toggle, keep search input only**
+
+  ```tsx
+  <BlogFlowUI
+    apiKey="your-api-key"
+    showLanguageToggle={false}
+  />
+  ```
+
+- **Hide search bar completely (pure article list / static blog page)**
+
+  ```tsx
+  <BlogFlowUI
+    apiKey="your-api-key"
+    showSearchBar={false}
+  />
+  ```
 
 #### Pagination
 
@@ -165,7 +204,7 @@ That's it! You now have a fully functional blog with:
 
 ## Changelog
 
-### v1.0.2 (Latest)
+### v1.0.2
 - 🔄 **Updated API Endpoint** - Changed default API base URL to `https://api.blogflow.com.au/api/v2`
 
 ### v1.0.1
