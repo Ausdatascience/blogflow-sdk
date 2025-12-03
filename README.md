@@ -368,7 +368,7 @@ function SearchPage() {
 
 ### Zero-Config Usage (Default Theme)
 
-BlogFlow SDK includes automatic style injection with 15 built-in themes.
+BlogFlow SDK includes automatic style injection with 16 built-in themes.
 
 ```tsx
 import { BlogFlowProvider, BlogPostList } from '@blogflow/sdk/react'
@@ -383,7 +383,7 @@ import { BlogFlowProvider, BlogPostList } from '@blogflow/sdk/react'
 ```tsx
 <BlogFlowProvider config={{ 
   apiKey: 'your-key',
-  styles: { theme: 'violet' }  // 'default' | 'minimal' | 'modern' | 'dark' | 'magic' | 'violet' | etc.
+  styles: { theme: 'cardinal' }  // 'default' | 'minimal' | 'modern' | 'dark' | 'magic' | 'violet' | 'cardinal' | etc.
 }}>
   <BlogPostList posts={posts} />
 </BlogFlowProvider>

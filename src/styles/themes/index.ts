@@ -18,6 +18,7 @@ import { purewhiteTheme } from './purewhite'
 import { pureblackTheme } from './pureblack'
 import { cyanblueTheme } from './cyanblue'
 import { violetTheme } from './violet'
+import { cardinalTheme } from './cardinal'
 import type { Theme, ThemeName } from '../types'
 
 export const themes: Record<Exclude<ThemeName, 'none'>, Theme> = {
@@ -36,6 +37,7 @@ export const themes: Record<Exclude<ThemeName, 'none'>, Theme> = {
   pureblack: pureblackTheme,
   cyanblue: cyanblueTheme,
   violet: violetTheme,
+  cardinal: cardinalTheme,
 }
 
 export function getTheme(name: ThemeName): Theme | null {
@@ -59,5 +61,6 @@ export {
   pureblackTheme,
   cyanblueTheme,
   violetTheme,
+  cardinalTheme,
 }
 
