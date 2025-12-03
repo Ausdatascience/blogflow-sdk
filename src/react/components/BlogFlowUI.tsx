@@ -71,6 +71,7 @@ const SEARCH_MODES = [
 
 type ViewMode = (typeof VIEW_MODES)[number]['value']
 type SearchMode = 'server' | 'client'
+type PaginationPosition = 'top' | 'bottom' | 'both'
 
 export interface BlogFlowUIConfig {
   /** Required: Your BlogFlow API key */
@@ -87,12 +88,18 @@ export interface BlogFlowUIConfig {
   defaultSearchMode?: SearchMode
   /** Default pagination variant (default: 'mixed') */
   defaultPaginationVariant?: PaginationVariant
+  /** Where to show pagination controls: 'bottom', 'top', or 'both' (default: 'bottom') */
+  paginationPosition?: PaginationPosition
   /** Number of posts per page (default: 12) */
   pageSize?: number
   /** Show control panel for theme/view/search mode selection (default: true) */
   showControlPanel?: boolean
   /** Show card display options (excerpt, category, date) (default: true) */
   showCardOptions?: boolean
+  /** Show the language toggle in the search bar (default: true) */
+  showLanguageToggle?: boolean
+  /** Show the search bar (default: true) */
+  showSearchBar?: boolean
   /** Page title (default: 'Blog') */
   title?: string
   /** Callback when a post is clicked */
@@ -110,9 +117,12 @@ function BlogFlowContent({
   defaultViewMode = 'card',
   defaultSearchMode = 'server',
   defaultPaginationVariant = 'mixed',
+  paginationPosition = 'bottom',
   pageSize = 12,
   showControlPanel = true,
   showCardOptions = true,
+  showLanguageToggle = true,
+  showSearchBar = true,
   title = 'Blog',
   onPostClick,
   defaultLanguage = 'en',
@@ -460,37 +470,59 @@ function BlogFlowContent({
       )}
 
       {/* Search Bar */}
-      <BlogSearch
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
-        language={language}
-        showLanguageToggle={true}
-        onLanguageChange={setLanguage}
-        showRefreshButton={true}
-        onRefresh={refresh}
-        loading={loading}
-        resultCount={resultCount}
-        totalCount={displayTotalCount}
-        showTitle={true}
-        showCount={true}
-      />
+      {showSearchBar && (
+        <BlogSearch
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          language={language}
+          showLanguageToggle={showLanguageToggle}
+          onLanguageChange={setLanguage}
+          showRefreshButton={true}
+          onRefresh={refresh}
+          loading={loading}
+          resultCount={resultCount}
+          totalCount={displayTotalCount}
+          showTitle={true}
+          showCount={true}
+        />
+      )}
+
+      {/* Top Pagination (optional) */}
+      {(paginationPosition === 'top' || paginationPosition === 'both') && (
+        <div style={{ marginBottom: '1.5rem' }}>
+          <Pagination
+            currentPage={displayCurrentPage}
+            totalPages={displayTotalPages}
+            totalCount={displayTotalCount}
+            onPageChange={searchTerm ? setSearchPage : fetchPage}
+            language={language}
+            loading={loading}
+            showInfo={true}
+            showQuickJump={true}
+            showFirstLast={true}
+            variant={paginationVariant}
+          />
+        </div>
+      )}
 
       {/* Posts View */}
       {renderPostsView()}
 
-      {/* Pagination */}
-      <Pagination
-        currentPage={displayCurrentPage}
-        totalPages={displayTotalPages}
-        totalCount={displayTotalCount}
-        onPageChange={searchTerm ? setSearchPage : fetchPage}
-        language={language}
-        loading={loading}
-        showInfo={true}
-        showQuickJump={true}
-        showFirstLast={true}
-        variant={paginationVariant}
-      />
+      {/* Bottom Pagination (optional) */}
+      {(paginationPosition === 'bottom' || paginationPosition === 'both') && (
+        <Pagination
+          currentPage={displayCurrentPage}
+          totalPages={displayTotalPages}
+          totalCount={displayTotalCount}
+          onPageChange={searchTerm ? setSearchPage : fetchPage}
+          language={language}
+          loading={loading}
+          showInfo={true}
+          showQuickJump={true}
+          showFirstLast={true}
+          variant={paginationVariant}
+        />
+      )}
     </div>
   )
 }

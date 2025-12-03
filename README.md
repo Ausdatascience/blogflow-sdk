@@ -44,10 +44,14 @@ That's it! You now have a fully functional blog with:
   defaultLanguage="en"
   defaultTheme="dark"
   defaultViewMode="magazine"
+  defaultSearchMode="server"
+  defaultPaginationVariant="mixed"
+  paginationPosition="bottom"
   pageSize={20}
   title="My Blog"
   showControlPanel={true}
   showCardOptions={true}
+  showLanguageToggle={true}
   onPostClick={(slug) => router.push(`/post/${slug}`)}
 />
 ```
@@ -62,6 +66,86 @@ That's it! You now have a fully functional blog with:
   defaultTheme="minimal"
 />
 ```
+
+### BlogFlowUI Props & Options
+
+#### Core Props
+
+- **apiKey** `string` (required): Your BlogFlow API key.
+- **baseUrl** `string` (optional): Custom API base URL (default: `https://api.blogflow.com.au/api/v2`).
+- **defaultLanguage** `SupportedLanguage` (default: `'en'`):
+  - Supported: `en`, `zh`, `es`, `fr`, `de`, `ja`, `ko`
+- **title** `string` (default: `'Blog'`): Page title shown above the UI.
+- **onPostClick** `(slug: string) => void` (optional): Custom handler when a post is clicked.
+- **pageSize** `number` (default: `12`): Number of posts per page.
+- **className** `string` (optional): Custom CSS class for the outer container.
+- **style** `React.CSSProperties` (optional): Inline styles for the outer container.
+
+#### Theme Options
+
+- **defaultTheme** `string` (default: `'default'`):
+  - Available themes:
+    - `default`
+    - `blue`
+    - `minimal`
+    - `modern`
+    - `dark`
+    - `magic`
+    - `fantasy`
+    - `adventure`
+    - `tomorrow`
+    - `mainstreet`
+    - `eyecare`
+    - `purewhite`
+    - `pureblack`
+    - `cyanblue`
+    - `violet`
+    - `cardinal`
+
+#### View Modes
+
+- **defaultViewMode** `ViewMode` (default: `'card'`):
+  - Available view modes:
+    - `card`
+    - `list`
+    - `grid`
+    - `masonry`
+    - `waterfall`
+    - `magazine`
+    - `dense`
+    - `timeline`
+    - `fullscreen`
+    - `fast`
+    - `modern`
+    - `carousel`
+
+#### Search
+
+- **defaultSearchMode** `'server' | 'client'` (default: `'server'`):
+  - **`server`**: Use server-side search via API (recommended, faster on large datasets).
+  - **`client`**: Filter already-loaded posts in the browser.
+- **showLanguageToggle** `boolean` (default: `true`):
+  - Whether to show the language switcher button in the search bar.
+
+#### Pagination
+
+- **defaultPaginationVariant** `PaginationVariant` (default: `'mixed'`):
+  - Available variants:
+    - `text`
+    - `icon`
+    - `mixed`
+    - `simple`
+- **paginationPosition** `'top' | 'bottom' | 'both'` (default: `'bottom'`):
+  - `top`: Only show pagination above the posts.
+  - `bottom`: Only show pagination below the posts.
+  - `both`: Show pagination both above and below the posts.
+
+#### UI Toggles
+
+- **showControlPanel** `boolean` (default: `true`):
+  - Show the top control panel (theme selector, view mode selector, search mode, pagination style).
+- **showCardOptions** `boolean` (default: `true`):
+  - Show the card display options (toggle excerpt, category, date).
 
 ## ✨ Key Features
 
