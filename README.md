@@ -78,7 +78,7 @@ That's it! You now have a fully functional blog with:
 #### Core Props
 
 - **apiKey** `string` (required): Your BlogFlow API key.
-- **baseUrl** `string` (optional): Custom API base URL (default: `https://api.blogflow.com.au/api/v2`).
+- **baseUrl** `string` (optional): Custom API base URL (default: `https://api2.blogflow.com.au/api/v2`).
 - **defaultLanguage** `SupportedLanguage` (default: `'en'`):
   - Supported: `en`, `zh`, `es`, `fr`, `de`, `ja`, `ko`
 - **title** `string` (default: `'Blog'`): Page title shown above the UI.
@@ -204,8 +204,12 @@ That's it! You now have a fully functional blog with:
 
 ## Changelog
 
+### v1.0.4
+- 🔄 **API Base URL Update** - Default API base URL updated to `https://api2.blogflow.com.au/api/v2`
+- 📝 **Documentation Sync** - Updated examples and configuration docs to use `api2` endpoint consistently
+
 ### v1.0.2
-- 🔄 **Updated API Endpoint** - Changed default API base URL to `https://api.blogflow.com.au/api/v2`
+- 🔄 **Updated API Endpoint** - Changed default API base URL to `https://api2.blogflow.com.au/api/v2`
 
 ### v1.0.1
 - 🐛 **Fixed Infinite Loop Issues** - Resolved React hooks dependency issues in `useBlogPosts`, `useBlogSearch`, and `useServerSearch` that caused "Maximum update depth exceeded" errors
@@ -470,7 +474,7 @@ Create a `.env.local` file:
 
 ```bash
 BLOGFLOW_API_KEY=your-api-key-here
-BLOGFLOW_API_URL=https://api.blogflow.com.au/api/v2  # optional
+BLOGFLOW_API_URL=https://api2.blogflow.com.au/api/v2  # optional
 ```
 
 ```typescript
@@ -508,7 +512,7 @@ import { BlogFlow, createClient } from '@blogflow/sdk/core'
 
 const client = new BlogFlow({
   apiKey: 'your-api-key-here',
-  baseUrl: 'https://api.blogflow.com.au/api/v2',
+  baseUrl: 'https://api2.blogflow.com.au/api/v2',
   defaultLanguage: 'en'
 })
 

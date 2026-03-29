@@ -19,7 +19,7 @@ import {
   NextFetchOptions,
 } from '../types'
 
-const DEFAULT_BASE_URL = 'https://api.blogflow.com.au/api/v2'
+const DEFAULT_BASE_URL = 'https://api2.blogflow.com.au/api/v2'
 
 export class BlogFlow {
   private apiKey: string

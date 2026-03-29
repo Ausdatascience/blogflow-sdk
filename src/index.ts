@@ -11,7 +11,7 @@
  * // Create client
  * const client = new BlogFlow({
  *   apiKey: 'your-api-key',
- *   baseUrl: 'https://api.blogflow.com.au/api/v2',
+ *   baseUrl: 'https://api2.blogflow.com.au/api/v2',
  *   defaultLanguage: 'zh'
  * })
  * 
